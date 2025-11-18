@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<?import javafx.scene.control.PasswordField?>
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
+            prefHeight="600.0" prefWidth="800.0"
+            style="-fx-background-color: #8ab48f;"
+            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="com.tank2d.tankverse.ui.JoinRoomController">
+
+    <!-- Main Join Room Container -->
+    <VBox alignment="TOP_CENTER" layoutX="100.0" layoutY="50.0" prefHeight="500.0" prefWidth="600.0"
+          spacing="12.0" style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 4; -fx-background-radius: 5; -fx-border-radius: 5;">
+
+        <padding>
+            <Insets bottom="20.0" left="25.0" right="25.0" top="20.0" />
+        </padding>
+
+        <!-- Title -->
+        <Label text="Join Room" textFill="#704214">
+            <font>
+                <Font name="System Bold" size="34.0" />
+            </font>
+        </Label>
+
+        <Label text="~ Choose Your Battle ~" textFill="#8a6f47">
+            <font>
+                <Font size="14.0" />
+            </font>
+        </Label>
+
+        <!-- Search and Refresh -->
+        <HBox spacing="10.0" alignment="CENTER">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+
+            <TextField fx:id="txtSearch" promptText="Search room name..."
+                       prefHeight="36.0" prefWidth="350.0"
+                       style="-fx-background-color: white;
+                           -fx-border-color: #8a6f47;
+                           -fx-border-width: 2;
+                           -fx-background-insets: 0;
+                           -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </TextField>
+
+            <Button fx:id="btnRefresh" mnemonicParsing="false"
+                    onAction="#onRefresh" prefHeight="36.0" prefWidth="100.0" text="Refresh"
+                    style="-fx-background-color: #d4a574;
+                        -fx-border-color: #a67c52;
+                        -fx-border-width: 3;
+                        -fx-text-fill: white;">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Button>
+        </HBox>
+
+        <!-- Room List Table -->
+        <VBox spacing="6.0">
+            <Label text="Available Rooms:" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="13.0" />
+                </font>
+            </Label>
+
+            <TableView fx:id="tableRooms" prefHeight="250.0" prefWidth="550.0"
+                       style="-fx-background-color: white;
+                           -fx-border-color: #8a6f47;
+                           -fx-border-width: 3;">
+                <columns>
+                    <TableColumn fx:id="colRoomName" text="Room Name" prefWidth="200.0" />
+                    <TableColumn fx:id="colPlayers" text="Players" prefWidth="80.0" />
+                    <TableColumn fx:id="colMaxPlayers" text="Max" prefWidth="60.0" />
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100.0" />
+                    <TableColumn fx:id="colLocked" text="🔒" prefWidth="50.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+        <!-- Password Field (appears when locked room selected) -->
+        <HBox fx:id="passwordBox" spacing="10.0" alignment="CENTER" visible="false">
+            <Label text="Password:" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <PasswordField fx:id="txtPassword" promptText="Enter room password"
+                       prefHeight="32.0" prefWidth="250.0"
+                       style="-fx-background-color: white;
+                           -fx-border-color: #8a6f47;
+                           -fx-border-width: 2;
+                           -fx-background-insets: 0;
+                           -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </PasswordField>
+        </HBox>
+
+        <!-- Status Label -->
+        <Label fx:id="lblStatus" text="Select a room to join" textFill="#8a6f47" wrapText="true">
+            <font>
+                <Font size="11.0" />
+            </font>
+        </Label>
+
+        <!-- Buttons -->
+        <HBox spacing="12.0" alignment="CENTER">
+            <VBox.margin>
+                <Insets top="5.0" />
+            </VBox.margin>
+
+            <Button fx:id="btnJoin" mnemonicParsing="false"
+                    onAction="#onJoin" prefHeight="42.0" prefWidth="170.0" text="Join Room"
+                    style="-fx-background-color: #6b9080;
+                        -fx-border-color: #4a6859;
+                        -fx-border-width: 3;
+                        -fx-text-fill: white;">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Button>
+
+            <Button fx:id="btnBack" mnemonicParsing="false"
+                    onAction="#onBack" prefHeight="42.0" prefWidth="170.0" text="Back"
+                    style="-fx-background-color: #c54245;
+                        -fx-border-color: #8b2e31;
+                        -fx-border-width: 3;
+                        -fx-text-fill: white;">
+                <font>
+                    <Font name="System Bold" size="14.0" />
+                </font>
+            </Button>
+        </HBox>
+
+    </VBox>
+
+    <!-- Decorative elements -->
+    <Label layoutX="20.0" layoutY="20.0" text="⚔️" textFill="#704214">
+        <font>
+            <Font size="28.0" />
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="20.0" text="🛡️" textFill="#704214">
+        <font>
+            <Font size="28.0" />
+        </font>
+    </Label>
+    <Label layoutX="20.0" layoutY="550.0" text="🎯" textFill="#704214">
+        <font>
+            <Font size="28.0" />
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="550.0" text="💥" textFill="#704214">
+        <font>
+            <Font size="28.0" />
+        </font>
+    </Label>
+
+</AnchorPane>

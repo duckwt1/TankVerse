@@ -1,0 +1,131 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="800.0" style="-fx-background-color: #8ab48f;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tank2d.tankverse.ui.RegisterController">
+
+    <!-- Main Register Container -->
+    <VBox alignment="CENTER" layoutX="225.0" layoutY="40.0" prefHeight="460.0" prefWidth="350.0" spacing="12.0" style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 4; -fx-background-radius: 5; -fx-border-radius: 5;">
+
+        <padding>
+            <Insets bottom="25.0" left="30.0" right="30.0" top="25.0" />
+        </padding>
+
+        <!-- Title -->
+        <Label text="Tank 2D" textFill="#704214">
+            <font>
+                <Font name="System Bold" size="36.0" />
+            </font>
+        </Label>
+
+        <Label text="~ Create Account ~" textFill="#8a6f47">
+            <font>
+                <Font size="15.0" />
+            </font>
+        </Label>
+
+        <!-- Username Field -->
+        <VBox spacing="5.0">
+            <Label text="Username" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="txtUsername" prefHeight="36.0" promptText="Choose a username" style="-fx-background-color: white;                            -fx-border-color: #8a6f47;                            -fx-border-width: 2;                            -fx-background-insets: 0;                            -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </TextField>
+        </VBox>
+
+        <!-- Password Field -->
+        <VBox spacing="5.0">
+            <Label text="Password" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <PasswordField fx:id="txtPassword" prefHeight="36.0" promptText="Create password" style="-fx-background-color: white;                                -fx-border-color: #8a6f47;                                -fx-border-width: 2;                                -fx-background-insets: 0;                                -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </PasswordField>
+        </VBox>
+
+        <!-- Confirm Password Field -->
+        <VBox spacing="5.0">
+            <Label text="Confirm Password" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <PasswordField fx:id="txtConfirmPassword" prefHeight="36.0" promptText="Re-enter password" style="-fx-background-color: white;                                -fx-border-color: #8a6f47;                                -fx-border-width: 2;                                -fx-background-insets: 0;                                -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </PasswordField>
+        </VBox>
+
+        <!-- Email Field -->
+        <VBox spacing="5.0">
+            <Label text="Email (optional)" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="12.0" />
+                </font>
+            </Label>
+            <TextField fx:id="txtEmail" prefHeight="36.0" promptText="your@email.com" style="-fx-background-color: white;                            -fx-border-color: #8a6f47;                            -fx-border-width: 2;                            -fx-background-insets: 0;                            -fx-border-insets: 0;">
+                <font>
+                    <Font size="12.0" />
+                </font>
+            </TextField>
+        </VBox>
+
+        <!-- Status Label -->
+        <Label fx:id="lblStatus" text="" textFill="#c54245" wrapText="true">
+            <font>
+                <Font size="11.0" />
+            </font>
+        </Label>
+
+        <!-- Register Button -->
+        <Button fx:id="btnRegister" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onRegisterClick" prefHeight="40.0" style="-fx-background-color: #6b9080;                      -fx-border-color: #4a6859;                      -fx-border-width: 3;                      -fx-text-fill: white;" text="Register">
+            <font>
+                <Font name="System Bold" size="13.0" />
+            </font>
+        </Button>
+
+        <!-- Back Button -->
+        <Button fx:id="btnBackToLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false" onAction="#onBackToLoginClick" prefHeight="36.0" style="-fx-background-color: #d4a574;                      -fx-border-color: #a67c52;                      -fx-border-width: 3;                      -fx-text-fill: white;" text="Back to Login">
+            <font>
+                <Font size="12.0" />
+            </font>
+        </Button>
+
+    </VBox>
+
+    <!-- Decorative elements -->
+    <Label layoutX="20.0" layoutY="20.0" text="🌾" textFill="#704214">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="20.0" text="🌻" textFill="#704214">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+    <Label layoutX="20.0" layoutY="550.0" text="🌿" textFill="#704214">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="550.0" text="🍄" textFill="#704214">
+        <font>
+            <Font size="24.0" />
+        </font>
+    </Label>
+
+</AnchorPane>

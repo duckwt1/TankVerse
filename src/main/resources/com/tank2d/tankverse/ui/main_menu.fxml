@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0"
+            prefWidth="800.0" style="-fx-background-color: #8ab48f;" xmlns="http://javafx.com/javafx/17.0.2-ea"
+            xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tank2d.tankverse.ui.MainMenuController">
+
+    <!-- Main Menu Container -->
+    <VBox alignment="CENTER" layoutX="225.0" layoutY="80.0" prefHeight="440.0" prefWidth="350.0" spacing="15.0"
+          style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 4; -fx-background-radius: 5; -fx-border-radius: 5;">
+
+        <padding>
+            <Insets bottom="30.0" left="35.0" right="35.0" top="30.0"/>
+        </padding>
+
+        <!-- Game Title -->
+        <Label fx:id="lblTitle" text="Tank 2D" textFill="#704214">
+            <font>
+                <Font name="System Bold" size="42.0"/>
+            </font>
+        </Label>
+
+        <Label text="~ Main Menu ~" textFill="#8a6f47">
+            <font>
+                <Font size="16.0"/>
+            </font>
+        </Label>
+
+        <!-- Menu Buttons -->
+        <VBox alignment="CENTER" spacing="12.0">
+            <VBox.margin>
+                <Insets top="15.0"/>
+            </VBox.margin>
+
+            <Button fx:id="btnCreateRoom" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0"
+                    style="-fx-background-color: #6b9080;                         -fx-border-color: #4a6859;                         -fx-border-width: 3;"
+                    text="Create Room" textFill="white">
+                <font>
+                    <Font name="System Bold" size="15.0"/>
+                </font>
+            </Button>
+
+            <Button fx:id="btnJoinRoom" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0"
+                    style="-fx-background-color: #6b9080;                         -fx-border-color: #4a6859;                         -fx-border-width: 3;"
+                    text="Join Room" textFill="white">
+                <font>
+                    <Font name="System Bold" size="15.0"/>
+                </font>
+            </Button>
+
+            <Button fx:id="btnShop" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="45.0"
+                    style="-fx-background-color: #6b9080;                         -fx-border-color: #4a6859;                         -fx-border-width: 3;"
+                    text="Shop" textFill="white">
+                <font>
+                    <Font name="System Bold" size="15.0"/>
+                </font>
+            </Button>
+
+            <Button fx:id="btnSettings" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="42.0"
+                    style="-fx-background-color: #d4a574;                         -fx-border-color: #a67c52;                         -fx-border-width: 3;"
+                    text="Settings" textFill="white">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Button>
+
+            <Button fx:id="btnQuit" maxWidth="1.7976931348623157E308" mnemonicParsing="false" prefHeight="42.0"
+                    style="-fx-background-color: #c54245;                         -fx-border-color: #8b2e31;                         -fx-border-width: 3;"
+                    text="Quit" textFill="white">
+                <font>
+                    <Font size="14.0"/>
+                </font>
+            </Button>
+        </VBox>
+
+    </VBox>
+
+    <!-- Decorative elements -->
+    <Label layoutX="20.0" layoutY="20.0" text="⚔️" textFill="#704214">
+        <font>
+            <Font size="28.0"/>
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="20.0" text="🛡️" textFill="#704214">
+        <font>
+            <Font size="28.0"/>
+        </font>
+    </Label>
+    <Label layoutX="20.0" layoutY="550.0" text="🎯" textFill="#704214">
+        <font>
+            <Font size="28.0"/>
+        </font>
+    </Label>
+    <Label layoutX="750.0" layoutY="550.0" text="💥" textFill="#704214">
+        <font>
+            <Font size="28.0"/>
+        </font>
+    </Label>
+
+</AnchorPane>
