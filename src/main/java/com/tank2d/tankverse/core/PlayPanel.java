@@ -81,7 +81,7 @@ public class PlayPanel extends Pane implements Runnable {
         if (found == null) {
             // create new if not exist
             Polygon solid = new Polygon();
-            OtherPlayer newOp = new OtherPlayer(playerState.x, playerState.y, solid, 2.5, mapLoader, playerState.userName, this.player);
+            OtherPlayer newOp = new OtherPlayer(playerState.x, playerState.y, solid, 3, mapLoader, playerState.userName, this.player);
             players.add(newOp);
             //entities.add(newOp);
             System.out.println("[PlayPanel] Added new player: " + playerState.userName);

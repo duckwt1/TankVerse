@@ -39,7 +39,7 @@ public class OtherPlayer extends Entity{
     private double bounceVY = 0;
 
     // Tốc độ di chuyển và tốc độ xoay
-    private final double moveSpeed = 2.5;
+   // private final double moveSpeed = 2.5;
     private final double rotateSpeed = 2.0; // độ/khung hình
 
     // Pivot của nòng
