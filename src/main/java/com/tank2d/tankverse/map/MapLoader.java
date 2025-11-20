@@ -318,7 +318,6 @@ public class MapLoader {
 //        return false; // No collision
 //    }
     public boolean checkCollision(double x, double y, Entity player) {
-
         Polygon playerPoly = player.solidArea;
 
         // Quét các tile trong vùng player
@@ -429,7 +428,7 @@ public class MapLoader {
         }
 
         // draw player's solid area too
-        player.drawSolidArea(gc);
+        //player.drawSolidArea(gc);
     }
 
 

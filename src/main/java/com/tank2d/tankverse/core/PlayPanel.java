@@ -108,11 +108,11 @@ public class PlayPanel extends Pane implements Runnable {
 
         // Try to handle keys on the Panel itself
         setOnKeyPressed(e -> {
-            System.out.println("KeyPressed on PlayPanel: " + e.getCode());
+            //System.out.println("KeyPressed on PlayPanel: " + e.getCode());
             onKeyPressed(e);
         });
         setOnKeyReleased(e -> {
-            System.out.println("KeyReleased on PlayPanel: " + e.getCode());
+            //System.out.println("KeyReleased on PlayPanel: " + e.getCode());
             onKeyReleased(e);
         });
 
@@ -228,7 +228,7 @@ public class PlayPanel extends Pane implements Runnable {
         mapLoader.draw(gc, this.player);
         mapLoader.drawCollision(gc, this.player);
         player.draw(gc);
-        player.drawSolidArea(gc);
+        //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
     }

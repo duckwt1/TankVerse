@@ -29,10 +29,21 @@ public class Player extends Entity {
     // Trạng thái phím
     private boolean up, down, left, right;
 
-    // Tốc độ di chuyển và tốc độ xoay
-    private final double moveSpeed = 2.5;
-    private final double rotateSpeed = 6.0; // độ/khung hình
+    private boolean isBouncing = false;
+    private long bounceEndTime = 0;
 
+    private double bounceVX = 0;
+    private double bounceVY = 0;
+
+
+    // Tốc độ di chuyển và tốc độ xoay
+    private final double rotateSpeed = 2.5; // độ/khung hình
+    public int hp;
+    public int mp;
+    public int dmg;
+    public int defense;
+    public int crit;
+    public int range;
     // Pivot của nòng
     private double gunPivotX;
     private double gunPivotY;
@@ -45,6 +56,45 @@ public class Player extends Entity {
         getImages();
 
     }
+    public boolean willCollide(double testX, double testY, double bodyAngle) {
+
+        // Lưu lại solidArea cũ
+        Polygon old = this.solidArea;
+
+        // Tạo solidArea tạm
+        this.solidArea = buildSolidArea(testX, testY, bodyAngle);
+
+        // Kiểm tra collision
+        boolean result = mapLoader.checkCollision(testX, testY, this);
+
+        // Khôi phục solidArea cũ
+        this.solidArea = old;
+
+        return result;
+    }
+    private void resolveRotationCollision() {
+
+        // đẩy nhẹ sang các hướng để thoát va chạm
+        double[] pushX = { 1, -1,  0,  0, 1, -1 };
+        double[] pushY = { 0,  0,  1, -1, 1, -1 };
+
+        for (int i = 0; i < pushX.length; i++) {
+
+            double testX = x + pushX[i];
+            double testY = y + pushY[i];
+
+            if (!willCollide(testX, testY, bodyAngle)) {
+                // nếu thoát collision → cập nhật vị trí
+                x = testX;
+                y = testY;
+                return;
+            }
+        }
+    }
+
+
+
+    @Override
     public void initSolidArea() {
         solidArea = new Polygon();
 
@@ -92,49 +142,111 @@ public class Player extends Entity {
 
     @Override
     public void update() {
+
         initSolidArea();
+
         double dx = 0, dy = 0;
 
-        if (up) dy -= moveSpeed;
-        if (down) dy += moveSpeed;
-        if (left) dx -= moveSpeed;
-        if (right) dx += moveSpeed;
+        if (up)    dy -= speed;
+        if (down)  dy += speed;
+        if (left)  dx -= speed;
+        if (right) dx += speed;
 
-        double newX = x;
-        double newY = y;
+        // BACKWARD (SPACE)
+        if (backward) {
+            double rad = Math.toRadians(bodyAngle);
+            dx = -Math.cos(rad) * speed;
+            dy = -Math.sin(rad) * speed;
+        }
 
-        if (dx != 0 || dy != 0) {
-            // Tính góc đích (mục tiêu)
+        // ===== ROTATION =====
+        if (!backward && (dx != 0 || dy != 0)) {  // <= FIXED
+
             targetAngle = Math.toDegrees(Math.atan2(dy, dx));
             double diff = normalizeAngle(targetAngle - bodyAngle);
 
-            if (Math.abs(diff) < rotateSpeed) {
-                bodyAngle = targetAngle;
+            double newAngle = bodyAngle + Math.signum(diff) * rotateSpeed;
+
+            if (!willCollide(x, y, newAngle)) {
+                bodyAngle = newAngle;
             } else {
-                bodyAngle += Math.signum(diff) * rotateSpeed;
+                resolveRotationCollision();
+                if (!willCollide(x, y, newAngle)) {
+                    bodyAngle = newAngle;
+                } else {
+                    return;
+                }
             }
 
-            // Tiến theo hướng thân
             double rad = Math.toRadians(bodyAngle);
-            newX += Math.cos(rad) * moveSpeed;
-            newY += Math.sin(rad) * moveSpeed;
-
-        } else if (backward) {
-            // Nếu nhấn SPACE → lùi
-            double rad = Math.toRadians(bodyAngle);
-            newX -= Math.cos(rad) * moveSpeed;
-            newY -= Math.sin(rad) * moveSpeed;
+            dx = Math.cos(rad) * speed;
+            dy = Math.sin(rad) * speed;
         }
 
-        // ---- Check collision ----
-        if (!mapLoader.checkCollision(newX, newY, this)) {
-            x = newX;
-            y = newY;
+        // ===== MOVEMENT =====
+        if (willCollide(x + dx, y + dy, bodyAngle)) {
+            System.out.println("collide");
+            return;
+        }
+
+        double nextX = x + dx;
+        double nextY = y + dy;
+
+        if (!willCollide(nextX, nextY, bodyAngle)) {
+            x = nextX;
+            y = nextY;
         } else {
-             //Nếu có va chạm, bạn có thể thêm hiệu ứng dừng hoặc trượt nhẹ
-             System.out.println("Collision detected!");
+            startBounce(dx, dy);
         }
     }
+
+
+    public Polygon buildSolidArea(double testX, double testY, double angleDeg) {
+        Polygon p = new Polygon();
+
+        double rad = Math.toRadians(angleDeg);
+
+        double[][] corners = {
+                { solidAreaX - bodyImage.getWidth()/2,  solidAreaY - bodyImage.getHeight()/2 },
+                { solidAreaX + solidWidth - bodyImage.getWidth()/2,  solidAreaY - bodyImage.getHeight()/2 },
+                { solidAreaX + solidWidth - bodyImage.getWidth()/2,  solidAreaY + solidHeight - bodyImage.getHeight()/2 },
+                { solidAreaX - solidAreaX - bodyImage.getWidth()/2,  solidAreaY + solidHeight - bodyImage.getHeight()/2 }
+        };
+
+        for (double[] c : corners) {
+            double rx = c[0] * Math.cos(rad) - c[1] * Math.sin(rad);
+            double ry = c[0] * Math.sin(rad) + c[1] * Math.cos(rad);
+
+            p.addPoint((int)(testX + rx), (int)(testY + ry));
+        }
+
+        return p;
+    }
+
+
+
+    private void startBounce(double dx, double dy) {
+
+        isBouncing = true;
+        bounceEndTime = System.currentTimeMillis() + 500; // 0.5s
+
+        // Vector bật ngược lại
+        double backX = -dx;
+        double backY = -dy;
+
+        double len = Math.sqrt(backX * backX + backY * backY);
+        if (len == 0) return;
+
+        backX /= len;
+        backY /= len;
+
+        // Tốc độ bật lại ban đầu (cảm giác mạnh)
+        double initialBounceSpeed = 12;
+
+        bounceVX = backX * initialBounceSpeed;
+        bounceVY = backY * initialBounceSpeed;
+    }
+
 
 
     @Override

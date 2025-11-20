@@ -14,6 +14,7 @@ public abstract class Entity {
     public Image[] images;
     public int spriteNum = 0;
     public MapLoader mapLoader;
+
     public Entity(double x, double y, Polygon solidArea, double speed, MapLoader mapLoader) {
         this.x = x;
         this.y = y;
@@ -21,7 +22,7 @@ public abstract class Entity {
         this.speed = speed;
         this.mapLoader = mapLoader;
     }
-
+    public void initSolidArea(){};
     public void getImages() {}
     public void update() {}
 
