@@ -1,6 +1,8 @@
 package com.tank2d.tankverse.ui;
 
 import com.tank2d.tankverse.core.*;
+import com.tank2d.tankverse.net.P2PConnection;
+import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.Packet;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
@@ -160,7 +162,7 @@ public class WaitingRoomController implements PacketListener {
         Platform.runLater(() -> {
             lblStatus.setText((String) p.data.get("msg"));
             System.out.println(p.data.toString());
-            boolean isHost =  p.data.getOrDefault("isHost", "none").equals(client.getUserName());
+            boolean isHost = p.data.getOrDefault("isHost", "none").equals(client.getUserName());
             List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
 
             // Create the play panel with player list
@@ -174,13 +176,67 @@ public class WaitingRoomController implements PacketListener {
             int udpPort = getInt(p.data.getOrDefault("host_udp_port", 4001), 4001);
             String hostIp = p.data.getOrDefault("host_ip", "127.0.0.1").toString();
 
-            if (isHost) {
-                GameMiniServer miniServer = new GameMiniServer(playPanel, udpPort);
-                miniServer.start();
-            } else {
-                GameClientUDP udpClient = new GameClientUDP(playPanel, hostIp, udpPort);
-                udpClient.start();
-            }
+            // Try P2P with UDP hole punching via Rendezvous server
+            lblStatus.setText("Connecting P2P...");
+            
+            new Thread(() -> {
+                try {
+                    P2PConnection p2p = new P2PConnection(
+                        Constant.RENDEZVOUS_HOST,
+                        Constant.RENDEZVOUS_PORT,
+                        roomId,
+                        client.getUserName()
+                    );
+                    
+                    boolean connected = p2p.connect();
+                    
+                    Platform.runLater(() -> {
+                        if (connected && !p2p.getPeers().isEmpty()) {
+                            // P2P connection successful
+                            lblStatus.setText("P2P Connected!");
+                            
+                            if (isHost) {
+                                // Host runs mini server for P2P
+                                GameMiniServer miniServer = new GameMiniServer(playPanel, udpPort);
+                                miniServer.start();
+                                System.out.println("[P2P] Host started GameMiniServer on port " + udpPort);
+                            } else {
+                                // Client connects to host via P2P
+                                GameClientUDP udpClient = new GameClientUDP(playPanel, hostIp, udpPort);
+                                udpClient.start();
+                                System.out.println("[P2P] Client connected to host via P2P");
+                            }
+                        } else {
+                            // P2P failed, fallback to direct connection
+                            lblStatus.setText("P2P failed, using direct connection");
+                            System.out.println("[P2P] Fallback to direct connection");
+                            
+                            if (isHost) {
+                                GameMiniServer miniServer = new GameMiniServer(playPanel, udpPort);
+                                miniServer.start();
+                            } else {
+                                GameClientUDP udpClient = new GameClientUDP(playPanel, hostIp, udpPort);
+                                udpClient.start();
+                            }
+                        }
+                    });
+                    
+                } catch (Exception e) {
+                    System.err.println("[P2P] Error: " + e.getMessage());
+                    e.printStackTrace();
+                    
+                    Platform.runLater(() -> {
+                        // Fallback to original P2P method
+                        if (isHost) {
+                            GameMiniServer miniServer = new GameMiniServer(playPanel, udpPort);
+                            miniServer.start();
+                        } else {
+                            GameClientUDP udpClient = new GameClientUDP(playPanel, hostIp, udpPort);
+                            udpClient.start();
+                        }
+                    });
+                }
+            }).start();
 
             new Thread(playPanel).start();
         });
