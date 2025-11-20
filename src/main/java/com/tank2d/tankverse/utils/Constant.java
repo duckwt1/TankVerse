@@ -14,4 +14,11 @@ public class Constant {
     public static final int PLAYER_WIDTH = 32;
     public static final int PLAYER_TILE_SIZE = 64;
     
+    // Server Configuration (Playit.gg)
+    public static final String DEFAULT_SERVER_HOST = "after-pennsylvania.gl.at.ply.gg";
+    public static final int DEFAULT_SERVER_PORT = 6098;
+    
+    // Fallback to localhost for LAN
+    public static final String LOCALHOST = "localhost";
+    public static final int LOCALHOST_PORT = 6098;
 }

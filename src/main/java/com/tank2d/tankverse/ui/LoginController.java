@@ -3,6 +3,7 @@ package com.tank2d.tankverse.ui;
 import com.tank2d.tankverse.core.GameClient;
 import com.tank2d.tankverse.core.PacketListener;
 import com.tank2d.tankverse.utils.AnimationHelper;
+import com.tank2d.tankverse.utils.Constant;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -21,6 +22,7 @@ public class LoginController implements PacketListener {
     @FXML private VBox loginContainer;
 
     private GameClient client;
+    private boolean isConnected = false;
 
     @FXML
     public void initialize() {
@@ -30,14 +32,34 @@ public class LoginController implements PacketListener {
             AnimationHelper.fadeIn(loginContainer, 500);
         }
         
-        client = new GameClient();
-        client.setPacketListener(this);
-        try {
-            client.connect("localhost", 5000);
-            lblStatus.setText("Connected to server");
-        } catch (Exception e) {
-            lblStatus.setText("Cannot connect to server: " + e.getMessage());
-        }
+        // Auto-connect to default Playit server
+        connectToServerAsync(Constant.DEFAULT_SERVER_HOST, Constant.DEFAULT_SERVER_PORT);
+    }
+    
+    private void connectToServerAsync(String host, int port) {
+        lblStatus.setText("Connecting to server...");
+        isConnected = false;
+        
+        // Connect in background thread
+        new Thread(() -> {
+            try {
+                client = new GameClient();
+                client.setPacketListener(this);
+                client.connect(host, port);
+                
+                isConnected = true;
+                
+                Platform.runLater(() -> {
+                    lblStatus.setText("Connected to server");
+                });
+                
+            } catch (Exception e) {
+                isConnected = false;
+                Platform.runLater(() -> {
+                    lblStatus.setText("Connection failed: " + e.getMessage());
+                });
+            }
+        }).start();
     }
 
     @FXML
@@ -49,6 +71,11 @@ public class LoginController implements PacketListener {
             lblStatus.setText("Please enter username and password!");
             AnimationHelper.shake(txtUsername);
             AnimationHelper.shake(txtPassword);
+            return;
+        }
+        
+        if (!isConnected) {
+            lblStatus.setText("Not connected to server!");
             return;
         }
         
