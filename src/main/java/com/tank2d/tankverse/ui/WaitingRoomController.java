@@ -161,8 +161,17 @@ public class WaitingRoomController implements PacketListener {
     public void onGameStart(Packet p) {
         Platform.runLater(() -> {
             lblStatus.setText((String) p.data.get("msg"));
-            System.out.println(p.data.toString());
-            boolean isHost = p.data.getOrDefault("isHost", "none").equals(client.getUserName());
+            
+            String hostUsername = p.data.getOrDefault("isHost", "none").toString();
+            String myUsername = client.getUserName();
+            boolean isHost = hostUsername.equals(myUsername);
+            
+            System.out.println("===========================================");
+            System.out.println("[START_GAME] MY USERNAME: " + myUsername);
+            System.out.println("[START_GAME] HOST USERNAME: " + hostUsername);
+            System.out.println("[START_GAME] AM I HOST? " + isHost);
+            System.out.println("===========================================");
+            
             List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
 
             // Create the play panel with player list
@@ -176,7 +185,7 @@ public class WaitingRoomController implements PacketListener {
             int udpPort = getInt(p.data.getOrDefault("host_udp_port", 5001), 5001);
             String hostAddress = p.data.getOrDefault("host_ip", "localhost").toString();
             
-            System.out.println("[Game] isHost: " + isHost + ", UDP: " + hostAddress + ":" + udpPort);
+            System.out.println("[Game] UDP: " + hostAddress + ":" + udpPort);
 
             // Start UDP communication in background
             new Thread(() -> {
