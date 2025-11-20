@@ -74,62 +74,62 @@ public class OtherPlayer extends Entity{
 
     @Override
     public void update() {
-
-        initSolidArea();
-
-        double dx = 0, dy = 0;
-
-        if (up)    dy -= speed;
-        if (down)  dy += speed;
-        if (left)  dx -= speed;
-        if (right) dx += speed;
-
-        // BACKWARD (SPACE)
-        if (backward) {
-            double rad = Math.toRadians(bodyAngle);
-            dx = -Math.cos(rad) * speed;
-            dy = -Math.sin(rad) * speed;
-        }
-
-        // ===== ROTATION =====
-        if (!backward && (dx != 0 || dy != 0)) {  // <= FIXED
-
-            targetAngle = Math.toDegrees(Math.atan2(dy, dx));
-            double diff = normalizeAngle(targetAngle - bodyAngle);
-
-            double newAngle = bodyAngle + Math.signum(diff) * rotateSpeed;
-
-            if (!willCollide(x, y, newAngle)) {
-                bodyAngle = newAngle;
-            } else {
-                resolveRotationCollision();
-                if (!willCollide(x, y, newAngle)) {
-                    bodyAngle = newAngle;
-                } else {
-                    return;
-                }
-            }
-
-            double rad = Math.toRadians(bodyAngle);
-            dx = Math.cos(rad) * speed;
-            dy = Math.sin(rad) * speed;
-        }
-
-        // ===== MOVEMENT =====
-        if (willCollide(x + dx, y + dy, bodyAngle)) {
-            System.out.println("collide");
-            return;
-        }
-
-        double nextX = x + dx;
-        double nextY = y + dy;
-
-        if (!willCollide(nextX, nextY, bodyAngle)) {
-            x = nextX;
-            y = nextY;
-        } else {
-            startBounce(dx, dy);
-        }
+//
+//        initSolidArea();
+//
+//        double dx = 0, dy = 0;
+//
+//        if (up)    dy -= speed;
+//        if (down)  dy += speed;
+//        if (left)  dx -= speed;
+//        if (right) dx += speed;
+//
+//        // BACKWARD (SPACE)
+//        if (backward) {
+//            double rad = Math.toRadians(bodyAngle);
+//            dx = -Math.cos(rad) * speed;
+//            dy = -Math.sin(rad) * speed;
+//        }
+//
+//        // ===== ROTATION =====
+//        if (!backward && (dx != 0 || dy != 0)) {  // <= FIXED
+//
+//            targetAngle = Math.toDegrees(Math.atan2(dy, dx));
+//            double diff = normalizeAngle(targetAngle - bodyAngle);
+//
+//            double newAngle = bodyAngle + Math.signum(diff) * rotateSpeed;
+//
+//            if (!willCollide(x, y, newAngle)) {
+//                bodyAngle = newAngle;
+//            } else {
+//                resolveRotationCollision();
+//                if (!willCollide(x, y, newAngle)) {
+//                    bodyAngle = newAngle;
+//                } else {
+//                    return;
+//                }
+//            }
+//
+//            double rad = Math.toRadians(bodyAngle);
+//            dx = Math.cos(rad) * speed;
+//            dy = Math.sin(rad) * speed;
+//        }
+//
+//        // ===== MOVEMENT =====
+//        if (willCollide(x + dx, y + dy, bodyAngle)) {
+//            System.out.println("collide");
+//            return;
+//        }
+//
+//        double nextX = x + dx;
+//        double nextY = y + dy;
+//
+//        if (!willCollide(nextX, nextY, bodyAngle)) {
+//            x = nextX;
+//            y = nextY;
+//        } else {
+//            startBounce(dx, dy);
+//        }
     }
     private void startBounce(double dx, double dy) {
 

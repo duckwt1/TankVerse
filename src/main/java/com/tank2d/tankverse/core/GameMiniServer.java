@@ -24,19 +24,24 @@ public class GameMiniServer extends Thread {
 
     @Override
     public void run() {
-        try (DatagramSocket socket = new DatagramSocket(port)) {
+        DatagramSocket socket = null;
+        try {
+            socket = new DatagramSocket(port);
             socket.setBroadcast(true);
+            socket.setSoTimeout(100); // Small timeout to check running flag
+            
             byte[] buffer = new byte[2048];
-            System.out.println("[MiniServer] Running on UDP port " + port);
+            System.out.println("[MiniServer] Successfully started on UDP port " + port);
 
             while (running) {
-                DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-                socket.receive(packet);
-                String msg = new String(packet.getData(), 0, packet.getLength()).trim();
-                InetSocketAddress clientAddr = new InetSocketAddress(packet.getAddress(), packet.getPort());
+                try {
+                    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
+                    socket.receive(packet);
+                    String msg = new String(packet.getData(), 0, packet.getLength()).trim();
+                    InetSocketAddress clientAddr = new InetSocketAddress(packet.getAddress(), packet.getPort());
 
-                String[] parts = msg.split(" ");
-                if (parts.length == 11 && parts[0].equals("UPDATE")) {
+                    String[] parts = msg.split(" ");
+                    if (parts.length == 11 && parts[0].equals("UPDATE")) {
                     String username = parts[1];
                     double x = Double.parseDouble(parts[2]);
                     double y = Double.parseDouble(parts[3]);
@@ -87,12 +92,24 @@ public class GameMiniServer extends Thread {
                         socket.send(resp);
                     }
 
-                } else {
-                    System.out.println("[MiniServer] Invalid message: " + msg);
+                    } else {
+                        System.out.println("[MiniServer] Invalid message: " + msg);
+                    }
+                } catch (Exception innerEx) {
+                    // Timeout or other read errors - continue loop
+                    if (!(innerEx instanceof java.net.SocketTimeoutException)) {
+                        System.err.println("[MiniServer] Error processing packet: " + innerEx.getMessage());
+                    }
                 }
             }
         } catch (Exception e) {
+            System.err.println("[MiniServer] Fatal error: \" + e.getMessage()");
             e.printStackTrace();
+        } finally {
+            if (socket != null && !socket.isClosed()) {
+                socket.close();
+            }
+            System.out.println("[MiniServer] Stopped\"");
         }
     }
 
