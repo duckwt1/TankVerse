@@ -182,38 +182,17 @@ public class WaitingRoomController implements PacketListener {
             stage.setScene(scene);
             stage.show();
 
-            int udpPort = getInt(p.data.getOrDefault("host_udp_port", 5001), 5001);
-            String hostAddress = p.data.getOrDefault("host_ip", "localhost").toString();
+            // Get relay server info
+            String relayHost = p.data.getOrDefault("relay_host", "localhost").toString();
+            int relayPort = getInt(p.data.getOrDefault("relay_port", 11640), 11640);
+            int roomId = getInt(p.data.getOrDefault("room_id", 1), 1);
             
-            System.out.println("[Game] UDP: " + hostAddress + ":" + udpPort);
+            System.out.println("[Game] Relay Server: " + relayHost + ":" + relayPort + " (Room " + roomId + ")");
 
-            // Start UDP communication in background
-            new Thread(() -> {
-                try {
-                    if (isHost) {
-                        // Host: start mini server first
-                        System.out.println("[Host] Starting GameMiniServer on port " + udpPort);
-                        GameMiniServer miniServer = new GameMiniServer(playPanel, udpPort);
-                        miniServer.start();
-                        
-                        // Wait for server to fully start
-                        Thread.sleep(500);
-                        System.out.println("[Host] GameMiniServer ready");
-                        
-                    } else {
-                        // Client: wait a bit for host to start, then connect
-                        System.out.println("[Client] Waiting for host to start...");
-                        Thread.sleep(1000);
-                        
-                        System.out.println("[Client] Connecting to " + hostAddress + ":" + udpPort);
-                        GameClientUDP udpClient = new GameClientUDP(playPanel, hostAddress, udpPort);
-                        udpClient.start();
-                    }
-                } catch (Exception e) {
-                    System.err.println("[UDP] Error: " + e.getMessage());
-                    e.printStackTrace();
-                }
-            }).start();
+            // Start relay client (same for host and non-host)
+            GameRelayClient relayClient = new GameRelayClient(playPanel, relayHost, relayPort, roomId);
+            relayClient.start();
+            System.out.println("[Game] Started GameRelayClient");
 
             new Thread(playPanel).start();
         });
