@@ -203,25 +203,54 @@ public class PlayPanel extends Pane implements Runnable {
     }
 
     @Override
+    @Override
     public void run() {
-        gameLoop = new AnimationTimer() {
+        // Fixed timestep: 60 FPS
+        final double FRAME_TIME = 1_000_000_000.0 / 60.0; // 16.666ms
+        final double[] accumulator = {0};
+
+        AnimationTimer gameLoop = new AnimationTimer() {
+            private long lastTime = 0;
+
             @Override
             public void handle(long now) {
-                update();
-                draw();
+                if (lastTime == 0) {
+                    lastTime = now;
+                    return;
+                }
+
+                double delta = now - lastTime;
+                lastTime = now;
+                accumulator[0] += delta;
+
+                // update game exactly 60 times per second
+                while (accumulator[0] >= FRAME_TIME) {
+                    updateFixed60FPS();
+                    accumulator[0] -= FRAME_TIME;
+                }
+
+                draw(); // render as fast as possible
             }
         };
+
         gameLoop.start();
     }
-
-    private void update() {
+    private void updateFixed60FPS() {
         player.update();
-        for (OtherPlayer oP : players)
-        {
+        for (OtherPlayer oP : players) {
             oP.update();
         }
-        //for (Entity e : entities) e.update();
     }
+
+
+//    private void update() {
+//        player.update();
+//        for (OtherPlayer oP : players)
+//        {
+//            oP.update();
+//        }
+//        //for (Entity e : entities) e.update();
+//    }
 
     private void draw() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
