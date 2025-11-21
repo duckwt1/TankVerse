@@ -183,8 +183,8 @@ public class WaitingRoomController implements PacketListener {
             stage.show();
 
             // Get relay server info
-            String relayHost = p.data.getOrDefault("relay_host", "localhost").toString();
-            int relayPort = getInt(p.data.getOrDefault("relay_port", 11640), 11640);
+            String relayHost = Constant.DEFAULT_RELAY_HOST;
+            int relayPort = Constant.DEFAULT_RELAY_PORT;
             int roomId = getInt(p.data.getOrDefault("room_id", 1), 1);
             
             System.out.println("[Game] Relay Server: " + relayHost + ":" + relayPort + " (Room " + roomId + ")");
