@@ -48,31 +48,23 @@ public class GameClientUDP extends Thread {
 
                 byte[] data = msg.getBytes();
                 socket.send(new DatagramPacket(data, data.length, address, hostPort));
-                //System.out.println("[ClientUDP] Sent UPDATE to " + hostIp + ":" + hostPort);
 
                 // Receive broadcast
                 DatagramPacket response = new DatagramPacket(buffer, buffer.length);
                 try {
                     socket.receive(response);
                     String reply = new String(response.getData(), 0, response.getLength()).trim();
-                    System.out.println("[ClientUDP] ✅ Received: " + reply.substring(0, Math.min(100, reply.length())) + "...");
+                    System.out.println(reply);
                     if (reply.startsWith("STATE")) {
                         String[] playersData = reply.substring(6).trim().split(";");
-                        System.out.println("[ClientUDP] Parsing STATE, found " + playersData.length + " player entries");
                         for (String pd : playersData) {
                             pd = pd.trim();
                             if (pd.isEmpty()) continue;
                             String[] p = pd.split(" ");
-                            if (p.length != 10) {
-                                System.err.println("[ClientUDP] Invalid player data (expected 10 parts, got " + p.length + "): " + pd);
-                                continue;
-                            }
+                            if (p.length != 10) continue;
 
                             String name = p[0];
-                            if (name.equals(username)) {
-                                System.out.println("[ClientUDP] Skipping self: " + name);
-                                continue;
-                            }
+                            if (name.equals(username)) continue;
 
                             double x = Double.parseDouble(p[1]);
                             double y = Double.parseDouble(p[2]);

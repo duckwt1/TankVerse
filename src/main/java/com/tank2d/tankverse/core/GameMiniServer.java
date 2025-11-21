@@ -53,14 +53,11 @@ public class GameMiniServer extends Thread {
                     boolean right = parts[9].equals("1");
                     boolean backward = parts[10].equals("1");
 
-                    System.out.println("[MiniServer] UPDATE from " + username + " at " + clientAddr);
-
                     PlayerState ps = new PlayerState(username, x, y, bodyAngle, gunAngle,
                             up, down, left, right, backward);
 
                     playPanel.updateOtherPlayer(ps);
                     clients.put(username, clientAddr);
-                    System.out.println("[MiniServer] Total clients: " + clients.size());
 
                     // ✅ Broadcast to everyone including sender
                     StringBuilder stateMsg = new StringBuilder("STATE ");
@@ -90,13 +87,9 @@ public class GameMiniServer extends Thread {
                             .append(self.isBackward() ? 1 : 0).append("; ");
 
                     byte[] data = stateMsg.toString().getBytes();
-                    System.out.println("[MiniServer] Broadcasting STATE to " + clients.size() + " clients");
-                    System.out.println("[MiniServer] STATE content: " + stateMsg.toString().substring(0, Math.min(100, stateMsg.length())) + "...");
-                    
                     for (InetSocketAddress addr : clients.values()) {
                         DatagramPacket resp = new DatagramPacket(data, data.length, addr);
                         socket.send(resp);
-                        System.out.println("[MiniServer] Sent STATE to " + addr);
                     }
 
                     } else {
