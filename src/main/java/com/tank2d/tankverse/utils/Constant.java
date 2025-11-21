@@ -19,8 +19,7 @@ public class Constant {
     public static final int DEFAULT_SERVER_PORT = 11640;
     
     // Game Relay Server (UDP tunnel)
-    // For testing: use localhost or LAN IP
-    public static final String GAME_RELAY_HOST = "localhost"; // Change to LAN IP for network testing
+    public static final String GAME_RELAY_HOST = "takes-concerts.gl.at.ply.gg";
     public static final int GAME_RELAY_PORT = 4972;
     
     // Fallback to localhost for LAN
