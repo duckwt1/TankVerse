@@ -70,9 +70,14 @@ public class PlayPanel extends Pane implements Runnable {
     }
 
     public void updateOtherPlayer(PlayerState playerState) {
+        // Don't add self
+        if (playerState.userName.equals(this.userName)) {
+            return;
+        }
+        
         OtherPlayer found = null;
         for (OtherPlayer op : players) {
-            if (op.getName().equals(playerState.userName) || op.getName().equals(this.userName)) {
+            if (op.getName().equals(playerState.userName)) {
                 found = op;
                 break;
             }

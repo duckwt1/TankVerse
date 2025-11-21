@@ -1,7 +1,6 @@
 package com.tank2d.tankverse.ui;
 
 import com.tank2d.tankverse.core.*;
-import com.tank2d.tankverse.net.P2PConnection;
 import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.Packet;
 import javafx.application.Platform;
@@ -161,17 +160,17 @@ public class WaitingRoomController implements PacketListener {
     public void onGameStart(Packet p) {
         Platform.runLater(() -> {
             lblStatus.setText((String) p.data.get("msg"));
-            
+
             String hostUsername = p.data.getOrDefault("isHost", "none").toString();
             String myUsername = client.getUserName();
             boolean isHost = hostUsername.equals(myUsername);
-            
+
             System.out.println("===========================================");
             System.out.println("[START_GAME] MY USERNAME: " + myUsername);
             System.out.println("[START_GAME] HOST USERNAME: " + hostUsername);
             System.out.println("[START_GAME] AM I HOST? " + isHost);
             System.out.println("===========================================");
-            
+
             List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
 
             // Create the play panel with player list
@@ -182,11 +181,11 @@ public class WaitingRoomController implements PacketListener {
             stage.setScene(scene);
             stage.show();
 
-            // Get relay server info
-            String relayHost = p.data.getOrDefault("relay_host", "localhost").toString();
-            int relayPort = getInt(p.data.getOrDefault("relay_port", 11640), 11640);
+            // Get relay server info from constants (ignore server-sent values)
+            String relayHost = Constant.GAME_RELAY_HOST;
+            int relayPort = Constant.GAME_RELAY_PORT;
             int roomId = getInt(p.data.getOrDefault("room_id", 1), 1);
-            
+
             System.out.println("[Game] Relay Server: " + relayHost + ":" + relayPort + " (Room " + roomId + ")");
 
             // Start relay client (same for host and non-host)

@@ -18,9 +18,10 @@ public class Constant {
     public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
     public static final int DEFAULT_SERVER_PORT = 11640;
     
-    // Rendezvous Server for UDP Hole Punching
-    public static final String RENDEZVOUS_HOST = "takes-concerts.gl.at.ply.gg";
-    public static final int RENDEZVOUS_PORT = 4972;
+    // Game Relay Server (UDP tunnel)
+    // For testing: use localhost or LAN IP
+    public static final String GAME_RELAY_HOST = "localhost"; // Change to LAN IP for network testing
+    public static final int GAME_RELAY_PORT = 4972;
     
     // Fallback to localhost for LAN
     public static final String LOCALHOST = "localhost";
