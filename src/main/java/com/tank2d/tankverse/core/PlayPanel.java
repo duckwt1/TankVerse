@@ -70,9 +70,14 @@ public class PlayPanel extends Pane implements Runnable {
     }
 
     public void updateOtherPlayer(PlayerState playerState) {
+        // Skip updating self
+        if (playerState.userName.equals(this.userName)) {
+            return;
+        }
+        
         OtherPlayer found = null;
         for (OtherPlayer op : players) {
-            if (op.getName().equals(playerState.userName) || op.getName().equals(this.userName)) {
+            if (op.getName().equals(playerState.userName)) {
                 found = op;
                 break;
             }
@@ -84,9 +89,9 @@ public class PlayPanel extends Pane implements Runnable {
             OtherPlayer newOp = new OtherPlayer(playerState.x, playerState.y, solid, 3, mapLoader, playerState.userName, this.player);
             players.add(newOp);
             //entities.add(newOp);
-            System.out.println("[PlayPanel] Added new player: " + playerState.userName);
+            System.out.println("[PlayPanel] ✅ Added new OTHER player: " + playerState.userName + " (total others: " + players.size() + ")");
         } else {
-            //System.out.println("update data of " + found.getName());
+            //System.out.println("[PlayPanel] Updating player: " + playerState.userName);
             found.setX(playerState.x);
             found.setY(playerState.y);
             found.setBodyAngle(playerState.bodyAngle);
