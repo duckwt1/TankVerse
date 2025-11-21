@@ -13,6 +13,7 @@ public class GameRelayClient extends Thread {
     private final int relayPort;
     private final int roomId;
     private final String username;
+
     private volatile boolean running = true;
 
     private DatagramSocket socket;
@@ -30,14 +31,14 @@ public class GameRelayClient extends Thread {
     public void run() {
         try {
             socket = new DatagramSocket();
-            socket.setSoTimeout(200);
+            socket.setSoTimeout(1);  // ultra low latency
             serverAddr = InetAddress.getByName(relayHost);
 
-            // Send JOIN
+            // === JOIN ROOM ===
             sendRaw("JOIN " + roomId + " " + username);
             System.out.println("[RelayClient] JOIN sent");
 
-            // Try to get JOINED ack
+            // Try JOIN ACK (not required)
             try {
                 byte[] buf = new byte[256];
                 DatagramPacket pkt = new DatagramPacket(buf, buf.length);
@@ -46,14 +47,13 @@ public class GameRelayClient extends Thread {
                         new String(pkt.getData(), 0, pkt.getLength()));
             } catch (SocketTimeoutException ignored) {}
 
-            // Start sender + receiver threads
-            Thread sendThread = new Thread(this::sendLoop, "SendThread");
-            Thread recvThread = new Thread(this::receiveLoop, "ReceiveThread");
+            // ==== Start Send & Receive Threads ====
+            Thread sendThread = new Thread(this::sendLoop, "SEND_THREAD");
+            Thread recvThread = new Thread(this::receiveLoop, "RECV_THREAD");
 
             sendThread.start();
             recvThread.start();
 
-            // Wait until finished
             sendThread.join();
             recvThread.join();
 
@@ -64,19 +64,18 @@ public class GameRelayClient extends Thread {
         }
     }
 
-    //====================================================
-    // SEND LOOP (20–60 FPS)
-    //====================================================
+    //==========================================================
+    // SEND LOOP — FIXED 60 FPS
+    //==========================================================
     private void sendLoop() {
-        long interval = 16; // ~60 fps
+        long interval = 10; // 60fps
         long last = System.currentTimeMillis();
-
         int count = 0;
 
         while (running) {
             long now = System.currentTimeMillis();
-            if (now - last >= interval) {
 
+            if (now - last >= interval) {
                 Player player = playPanel.getPlayer();
 
                 String msg = "UPDATE " + roomId + " " + username + " " +
@@ -91,25 +90,23 @@ public class GameRelayClient extends Thread {
                         (player.isBackward() ? 1 : 0);
 
                 sendRaw(msg);
-                count++;
+                last = now;
 
+                count++;
                 if (count % 200 == 0)
                     System.out.println("[RelayClient] Sent " + count + " updates");
-
-                last = now;
             }
 
             try { Thread.sleep(1); } catch (Exception ignored) {}
         }
 
-        // send LEAVE when stopping
         sendRaw("LEAVE " + roomId + " " + username);
         System.out.println("[RelayClient] LEAVE sent");
     }
 
-    //====================================================
-    // RECEIVE LOOP
-    //====================================================
+    //==========================================================
+    // RECEIVE LOOP — NO DELAY
+    //==========================================================
     private void receiveLoop() {
         byte[] buffer = new byte[4096];
 
@@ -120,20 +117,22 @@ public class GameRelayClient extends Thread {
 
                 String msg = new String(pkt.getData(), 0, pkt.getLength()).trim();
 
-                if (msg.startsWith("STATE"))
+                // accept STATE only
+                if (msg.startsWith("STATE ")) {
                     parseState(msg);
+                }
 
             } catch (SocketTimeoutException ignored) {
-                // no packet in this frame
+                // no packet this tick
             } catch (Exception e) {
                 System.err.println("[RelayClient] Receive error: " + e.getMessage());
             }
         }
     }
 
-    //====================================================
+    //==========================================================
     // SEND RAW UDP
-    //====================================================
+    //==========================================================
     private void sendRaw(String text) {
         try {
             byte[] data = text.getBytes();
@@ -144,28 +143,39 @@ public class GameRelayClient extends Thread {
         }
     }
 
-    //====================================================
-    // PROCESS STATE PACKET
-    //====================================================
+    //==========================================================
+    // SAFE PARSE — NEVER CRASH
+    //==========================================================
     private void parseState(String msg) {
-        String[] players = msg.substring(6).trim().split(";");
 
-        for (String pd : players) {
-            pd = pd.trim();
-            if (pd.isEmpty()) continue;
+        try {
+            // 1) Must be at least "STATE X"
+            if (msg.length() < 7) return;
 
-            String[] p = pd.split(" ");
-            if (p.length != 10) {
-                System.err.println("[RelayClient] Invalid state packet: " +
-                        Arrays.toString(p));
-                continue;
-            }
+            // 2) Extract body
+            String body = msg.substring(6).trim();
+            if (body.isEmpty()) return;
 
-            if (p[0].equals(username)) continue;
+            // 3) Split players
+            String[] players = body.split(";");
 
-            try {
+            for (String pd : players) {
+                if (pd == null) continue;
+                pd = pd.trim();
+                if (pd.isEmpty()) continue;
+
+                // Format: username x y body gun up down left right backward
+                String[] p = pd.split(" ");
+
+                if (p.length != 10) {
+                    continue;  // ignore malformed packet
+                }
+
+                String name = p[0];
+                if (name.equals(username)) continue; // skip self
+
                 PlayerState ps = new PlayerState(
-                        p[0],
+                        name,
                         Double.parseDouble(p[1]),
                         Double.parseDouble(p[2]),
                         Double.parseDouble(p[3]),
@@ -178,14 +188,15 @@ public class GameRelayClient extends Thread {
                 );
 
                 playPanel.updateOtherPlayer(ps);
-
-            } catch (Exception ex) {
-                System.err.println("[RelayClient] Parse fail: " + ex);
             }
+
+        } catch (Exception e) {
+            System.err.println("[RelayClient] ParseState error: " + e.getMessage());
+            // We ignore the bad pack et and continue normally.
         }
     }
 
-    //====================================================
+    //==========================================================
     public void stopClient() {
         running = false;
     }

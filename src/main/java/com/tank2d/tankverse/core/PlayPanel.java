@@ -203,7 +203,6 @@ public class PlayPanel extends Pane implements Runnable {
     }
 
     @Override
-    @Override
     public void run() {
         // Fixed timestep: 60 FPS
         final double FRAME_TIME = 1_000_000_000.0 / 60.0; // 16.666ms
