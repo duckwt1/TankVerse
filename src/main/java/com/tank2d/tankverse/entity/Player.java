@@ -44,6 +44,7 @@ public class Player extends Entity {
     public int defense;
     public int crit;
     public int range;
+    public int bullet = 0;
     // Pivot của nòng
     private double gunPivotX;
     private double gunPivotY;
@@ -54,6 +55,9 @@ public class Player extends Entity {
         this.playerName = playerName;
         this.mapLoader = mapLoader;
         getImages();
+        hp = 100;
+        bullet = 4;
+        dmg = 5;
 
     }
     public boolean willCollide(double testX, double testY, double bodyAngle) {

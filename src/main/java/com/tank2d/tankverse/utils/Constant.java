@@ -30,4 +30,10 @@ public class Constant {
 
     public static final String DEFAULT_RELAY_HOST = "try-crystal.gl.at.ply.gg";
     public static final int DEFAULT_RELAY_PORT = 65455;
+
+
+    public static final int SHOOT = 1;
+    public static final int SPEEDUP = 2;
+    public static final int EXPLODE = 3;
+
 }

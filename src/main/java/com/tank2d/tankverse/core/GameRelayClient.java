@@ -184,7 +184,7 @@ public class GameRelayClient extends Thread {
                         p[6].equals("1"),
                         p[7].equals("1"),
                         p[8].equals("1"),
-                        p[9].equals("1")
+                        p[9].equals("1"), 0, 0 , 0
                 );
 
                 playPanel.updateOtherPlayer(ps);

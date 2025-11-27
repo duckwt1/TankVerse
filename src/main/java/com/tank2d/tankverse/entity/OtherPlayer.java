@@ -37,6 +37,13 @@ public class OtherPlayer extends Entity{
 
     private double bounceVX = 0;
     private double bounceVY = 0;
+    public int hp;
+    public int mp;
+    public int dmg;
+    public int defense;
+    public int crit;
+    public int range;
+    public int bullet = 0;
 
     // Tốc độ di chuyển và tốc độ xoay
    // private final double moveSpeed = 2.5;
@@ -53,6 +60,9 @@ public class OtherPlayer extends Entity{
         this.mapLoader = mapLoader;
         this.player = player;
         getImages();
+        hp = 100;
+        bullet = 4;
+        dmg = 5;
 
     }
 
