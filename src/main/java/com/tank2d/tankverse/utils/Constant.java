@@ -13,14 +13,18 @@ public class Constant {
     public static final int PLAYER_HEIGHT = 48;
     public static final int PLAYER_WIDTH = 32;
     public static final int PLAYER_TILE_SIZE = 64;
-    
+
+    public static final int ACTION_NONE = 0;
+    public static final int ACTION_SHOOT = 1;
+    public static final int ACTION_CHARGE = 2;
+    public static final int ACTION_ABC = 3;
+
     // Server Configuration (Playit.gg - TCP + UDP)
     public static final String DEFAULT_SERVER_HOST = "per-mg.gl.at.ply.gg";
     //public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
 
     public static final int DEFAULT_SERVER_PORT = 41181;
     //public static final int DEFAULT_SERVER_PORT = 11640;
-
 
 
     // Fallback to localhost for LAN

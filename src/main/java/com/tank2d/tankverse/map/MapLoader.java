@@ -4,6 +4,7 @@ package com.tank2d.tankverse.map;
 
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.Player;
+import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.utils.Constant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -33,6 +34,7 @@ public class MapLoader {
     public int width;
     public int height;
     public Polygon testCollisionP;
+    private ArrayList<Bullet> bullets = new ArrayList<>();
 
     public MapLoader(int id) {
         this.id = id;
@@ -269,54 +271,78 @@ public class MapLoader {
 
             gc.strokePolygon(xs, ys, testCollisionP.npoints);
         }
+        //drawBullets(gc);
     }
-    // In MapLoader.java
-//    public boolean checkCollision(double x, double y, Polygon solidArea) {
-//        // Create player bounding box (based on position)
-//        Rectangle playerRect = new Rectangle(
-//                (int) (x + 8),  // offset (same as solidAreaX)
-//                (int) (y + 16), // offset (same as solidAreaY)
-//                (int) (Constant.TILESIZE * Constant.CHAR_SCALE - 16),
-//                (int) (Constant.TILESIZE * Constant.CHAR_SCALE - 16)
-//        );
-//
-//        int minTileX = playerRect.x / Constant.TILESIZE;
-//        int maxTileX = (playerRect.x + playerRect.width) / Constant.TILESIZE;
-//        int minTileY = playerRect.y / Constant.TILESIZE;
-//        int maxTileY = (playerRect.y + playerRect.height) / Constant.TILESIZE;
-//
-//        for (var layer : layers) {
-//            for (int ty = minTileY; ty <= maxTileY; ty++) {
-//                for (int tx = minTileX; tx <= maxTileX; tx++) {
-//                    // Bounds safety
-//                    if (ty < 0 || ty >= layer.data.length || tx < 0 || tx >= layer.data[0].length)
-//                        continue;
-//
-//                    int tileId = layer.data[ty][tx];
-//                    if (tileId == 0) continue;
-//
-//                    var tile = tiles[tileId];
-//                    if (tile == null || !tile.collision || tile.solidPolygon == null)
-//                        continue;
-//
-//                    // Build world-space polygon
-//                    Polygon poly = new Polygon(tile.solidPolygon.xpoints, tile.solidPolygon.ypoints, tile.solidPolygon.npoints);
-//                    poly.translate(tx * Constant.TILESIZE, ty * Constant.TILESIZE);
-//
-//                    // Check intersection
-//                    Area tileArea = new Area(poly);
-//                    Area playerArea = new Area(playerRect);
-//                    tileArea.intersect(playerArea);
-//
-//                    if (!tileArea.isEmpty()) {
-//                        return true; // Collision!
-//                    }
-//                }
-//            }
-//        }
-//
-//        return false; // No collision
-//    }
+    public void drawBullets(GraphicsContext gc, Player player) {
+        for (Bullet b : bullets) {
+            b.draw(gc, player);
+        }
+    }
+    public void addBullet(Bullet b) {
+        bullets.add(b);
+    }
+
+    public ArrayList<Bullet> getBullets() {
+        return bullets;
+    }
+
+    public void updateBullets(Player player) {
+        for (int i = 0; i < bullets.size(); i++) {
+            Bullet b = bullets.get(i);
+            b.update(player, this);
+
+            if (!b.isActive()) {
+                bullets.remove(i);
+                i--;
+            }
+        }
+    }
+    public boolean checkBulletCollision(Polygon bulletPoly) {
+
+        int minTileX = (int)(bulletPoly.getBounds().x / Constant.TILESIZE);
+        int minTileY = (int)(bulletPoly.getBounds().y / Constant.TILESIZE);
+        int maxTileX = (int)((bulletPoly.getBounds().x + bulletPoly.getBounds().width) / Constant.TILESIZE);
+        int maxTileY = (int)((bulletPoly.getBounds().y + bulletPoly.getBounds().height) / Constant.TILESIZE);
+
+        for (Layer layer : layers) {
+            if (!layer.visible) continue;
+
+            for (int ty = minTileY; ty <= maxTileY; ty++) {
+                for (int tx = minTileX; tx <= maxTileX; tx++) {
+
+                    if (ty < 0 || ty >= height || tx < 0 || tx >= width)
+                        continue;
+
+                    int gid = layer.data[ty][tx];
+                    if (gid <= 0 || gid >= tiles.length) continue;
+
+                    Tile tile = tiles[gid];
+                    if (tile == null || !tile.collision || tile.solidPolygon == null)
+                        continue;
+
+                    // Build tile polygon world-space
+                    Polygon tilePoly = new Polygon(
+                            tile.solidPolygon.xpoints,
+                            tile.solidPolygon.ypoints,
+                            tile.solidPolygon.npoints
+                    );
+                    tilePoly.translate(
+                            tx * Constant.TILESIZE,
+                            ty * Constant.TILESIZE
+                    );
+
+                    Area a = new Area(bulletPoly);
+                    a.intersect(new Area(tilePoly));
+
+                    if (!a.isEmpty()) return true; // HIT
+                }
+            }
+        }
+
+        return false;
+    }
+
+
     public boolean checkCollision(double x, double y, Entity player) {
         Polygon playerPoly = player.solidArea;
 

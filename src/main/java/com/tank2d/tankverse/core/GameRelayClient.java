@@ -1,6 +1,7 @@
 package com.tank2d.tankverse.core;
 
 import com.tank2d.tankverse.entity.Player;
+import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.PlayerState;
 
 import java.net.*;
@@ -77,7 +78,10 @@ public class GameRelayClient extends Thread {
 
             if (now - last >= interval) {
                 Player player = playPanel.getPlayer();
-
+                if (player.action == Constant.ACTION_CHARGE)
+                {
+                    player.action = Constant.ACTION_NONE;
+                }
                 String msg = "UPDATE " + roomId + " " + username + " " +
                         player.getX() + " " +
                         player.getY() + " " +
@@ -87,7 +91,11 @@ public class GameRelayClient extends Thread {
                         (player.isDown() ? 1 : 0) + " " +
                         (player.isLeft() ? 1 : 0) + " " +
                         (player.isRight() ? 1 : 0) + " " +
-                        (player.isBackward() ? 1 : 0);
+                        (player.isBackward() ? 1 : 0) + " " +
+                        player.hp + " " +
+                        player.bullet + " " +
+                        player.action;
+
 
                 sendRaw(msg);
                 last = now;
@@ -167,9 +175,12 @@ public class GameRelayClient extends Thread {
                 // Format: username x y body gun up down left right backward
                 String[] p = pd.split(" ");
 
-                if (p.length != 10) {
-                    continue;  // ignore malformed packet
+                // EXPECTING 13 FIELDS: name x y body gun up down left right backward hp ammo action
+                if (p.length < 13) {
+                    System.err.println("[RelayClient] Warning: malformed STATE: " + Arrays.toString(p));
+                    continue;
                 }
+
 
                 String name = p[0];
                 if (name.equals(username)) continue; // skip self
@@ -184,7 +195,10 @@ public class GameRelayClient extends Thread {
                         p[6].equals("1"),
                         p[7].equals("1"),
                         p[8].equals("1"),
-                        p[9].equals("1"), 0, 0 , 0
+                        p[9].equals("1"),
+                        Integer.parseInt(p[10]),
+                        Integer.parseInt(p[11]),
+                        Integer.parseInt(p[12])
                 );
 
                 playPanel.updateOtherPlayer(ps);

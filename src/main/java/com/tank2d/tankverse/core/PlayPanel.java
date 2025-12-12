@@ -96,6 +96,9 @@ public class PlayPanel extends Pane implements Runnable {
             found.setRight(playerState.right);
             found.setLeft(playerState.left);
             found.setBackward(playerState.backward);
+            found.hp = playerState.hp;
+            found.bullet = playerState.bullet;
+            found.action = playerState.action;
         }
     }
 
@@ -120,6 +123,7 @@ public class PlayPanel extends Pane implements Runnable {
         setFocusTraversable(true);
         setOnMouseClicked(e -> {
             requestFocus(); // clicking will give focus
+            player.action = Constant.ACTION_SHOOT;
             System.out.println("PlayPanel clicked -> requestFocus()");
         });
 
@@ -167,6 +171,7 @@ public class PlayPanel extends Pane implements Runnable {
             case SPACE -> player.setBackward(true);
         }
     }
+
 
     private void onKeyReleased(KeyEvent e) {
         KeyCode code = e.getCode();
@@ -239,6 +244,7 @@ public class PlayPanel extends Pane implements Runnable {
         for (OtherPlayer oP : players) {
             oP.update();
         }
+        mapLoader.updateBullets(this.player);
     }
 
 
@@ -259,5 +265,6 @@ public class PlayPanel extends Pane implements Runnable {
         //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
+        mapLoader.drawBullets(gc, player);
     }
 }

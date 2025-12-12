@@ -1,5 +1,7 @@
 package com.tank2d.tankverse.object;
 
+import com.tank2d.tankverse.entity.Player;
+import com.tank2d.tankverse.map.MapLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
@@ -14,9 +16,11 @@ public abstract class GameObject {
         this.image = image;
     }
 
-    public abstract void update();
-    public abstract void draw(GraphicsContext gc);
+    public abstract void update(Player player, MapLoader map);
 
     public double getX() { return x; }
     public double getY() { return y; }
+
+
+    public abstract void draw(GraphicsContext gc, Player player);
 }

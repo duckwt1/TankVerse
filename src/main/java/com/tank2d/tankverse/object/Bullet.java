@@ -1,62 +1,78 @@
 package com.tank2d.tankverse.object;
 
+import com.tank2d.tankverse.entity.Player;
+import com.tank2d.tankverse.map.MapLoader;
 import com.tank2d.tankverse.utils.Constant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
 public class Bullet extends GameObject {
 
-    private double angle;          // Hướng bay (radians)
-    private double speed = 12;     // Tốc độ bay
-    private String ownerName;      // Player bắn ra
+    private double angle;
+    private double speed = 12;
+    private String ownerName;
+    private boolean active = true;
 
-    private boolean active = true; // Khi đạn chạm tường/mục tiêu → inactive
+    public Bullet(double x, double y, double angle, String ownerName, int bulletId) {
+        super(x, y, new Image(Bullet.class.getResourceAsStream(
+                "/com/tank2d/tankverse/bullet/bullet" + bulletId + ".png"
+        )));
+        System.out.println(" da tao dan thanh cong");
 
-    public Bullet(double x, double y, double angle, String ownerName, Image bulletImage) {
-        super(x, y, bulletImage);
         this.angle = angle;
         this.ownerName = ownerName;
     }
 
     @Override
-    public void update() {
+    public void update(Player player, MapLoader map) {
         if (!active) return;
 
-        double dx = Math.cos(angle) * speed;
-        double dy = Math.sin(angle) * speed;
+        // move
+        x += Math.cos(angle) * speed;
+        y += Math.sin(angle) * speed;
 
-        x += dx;
-        y += dy;
+        // Bullet polygon = 1 điểm, nhưng convert thành polygon 2x2 để tránh lỗi
+        java.awt.Polygon bulletPoly = new java.awt.Polygon(
+                new int[]{(int)x, (int)x+2, (int)x+2, (int)x},
+                new int[]{(int)y, (int)y, (int)y+2, (int)y+2},
+                4
+        );
 
-        // Ra ngoài màn hình → biến mất
-        if (x < 0 || x > Constant.MAP_WIDTH || y < 0 || y > Constant.MAP_HEIGHT) {
+        // Kiểm tra collision
+        if (map.checkBulletCollision(bulletPoly)) {
+            active = false;
+            System.out.println("💥 Bullet hit a wall!");
+        }
+
+        // Out of screen
+        if (x < 0 || x > map.width * Constant.TILESIZE ||
+                y < 0 || y > map.height * Constant.TILESIZE) {
             active = false;
         }
     }
 
+
     @Override
-    public void draw(GraphicsContext gc) {
+    public void draw(GraphicsContext gc, Player player) {
         if (!active) return;
+
+        double screenX = x - player.x + Constant.SCREEN_WIDTH / 2.0;
+        double screenY = y - player.y + Constant.SCREEN_HEIGHT / 2.0;
 
         double w = image.getWidth();
         double h = image.getHeight();
 
         gc.save();
-        gc.translate(x, y);
+        gc.translate(screenX, screenY);
         gc.rotate(Math.toDegrees(angle));
-        gc.drawImage(image, -w / 2, -h / 2);
+        gc.drawImage(image, -w/2, -h/2);
         gc.restore();
     }
+
 
     public boolean isActive() {
         return active;
     }
-
-    public void destroy() {
-        active = false;
-    }
-
-    public String getOwnerName() {
-        return ownerName;
-    }
 }
+
+

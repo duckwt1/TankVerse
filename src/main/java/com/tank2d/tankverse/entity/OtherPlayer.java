@@ -1,6 +1,7 @@
 package com.tank2d.tankverse.entity;
 
 import com.tank2d.tankverse.map.MapLoader;
+import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.PlayerState;
 import javafx.scene.canvas.GraphicsContext;
@@ -84,7 +85,12 @@ public class OtherPlayer extends Entity{
 
     @Override
     public void update() {
-
+        if (this.action == Constant.ACTION_CHARGE)
+        {
+            System.out.println("avasvcs");
+            shootBullet();
+            this.action = Constant.ACTION_NONE;
+        }
         initSolidArea();
 
         double dx = 0, dy = 0;
@@ -314,7 +320,24 @@ public class OtherPlayer extends Entity{
         this.backward = state.backward;
         this.backward = state.backward;
     }
+    public void shootBullet() {
+        if (bullet <= 0) {
+            System.out.println("Hết đạn!");
+            return;
+        }
 
+        bullet--; // trừ đạn
+
+        double spawnX = x + Math.cos(gunAngle) * 30;
+        double spawnY = y + Math.sin(gunAngle) * 30;
+
+        // bullet là id đạn, ví dụ 1,2,3...
+        Bullet b = new Bullet(spawnX, spawnY, gunAngle, playerName, this.bullet);
+
+        mapLoader.addBullet(b);
+
+        System.out.println("► Player " + playerName + " bắn đạn loại " + this.bullet);
+    }
 
     public Polygon buildSolidArea(double testX, double testY, double angleDeg) {
         Polygon p = new Polygon();

@@ -20,8 +20,8 @@ public class GameClient {
     private BufferedReader in;
     private BufferedWriter out;
     private PacketListener listener;
-    private GameMiniServer miniServer;
-    private GameClientUDP udpClient;
+    //private GameMiniServer miniServer;
+    //private GameClientUDP udpClient;
     private String userName;
     private final Gson gson = new Gson();
 
@@ -171,21 +171,21 @@ public class GameClient {
         this.listener = listener;
     }
 
-    public void setUdpClient(GameClientUDP udpClient) {
-        this.udpClient = udpClient;
-    }
+//    public void setUdpClient(GameClientUDP udpClient) {
+//        this.udpClient = udpClient;
+//    }
 
-    public void setMiniServer(GameMiniServer miniServer) {
-        this.miniServer = miniServer;
-    }
+//    public void setMiniServer(GameMiniServer miniServer) {
+//        this.miniServer = miniServer;
+//    }
 
     public Socket getSocket() {
         return socket;
     }
 
-    public GameClientUDP getUdpClient() {
-        return udpClient;
-    }
+//    public GameClientUDP getUdpClient() {
+//        return udpClient;
+//    }
 
     public String getUserName() {
         return userName;
@@ -195,7 +195,7 @@ public class GameClient {
         this.userName = userName;
     }
 
-    public GameMiniServer getMiniServer() {
-        return miniServer;
-    }
+//    public GameMiniServer getMiniServer() {
+//        return miniServer;
+//    }
 }

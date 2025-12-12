@@ -2,6 +2,7 @@
 package com.tank2d.tankverse.entity;
 
 import com.tank2d.tankverse.map.MapLoader;
+import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.utils.Constant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -44,7 +45,7 @@ public class Player extends Entity {
     public int defense;
     public int crit;
     public int range;
-    public int bullet = 0;
+    public int bullet = 100;
     // Pivot của nòng
     private double gunPivotX;
     private double gunPivotY;
@@ -56,7 +57,7 @@ public class Player extends Entity {
         this.mapLoader = mapLoader;
         getImages();
         hp = 100;
-        bullet = 4;
+        bullet = 100;
         dmg = 5;
 
     }
@@ -146,7 +147,11 @@ public class Player extends Entity {
 
     @Override
     public void update() {
-
+        if (action == Constant.ACTION_SHOOT)
+        {
+            shootBullet();
+            action = Constant.ACTION_CHARGE;
+        }
         initSolidArea();
 
         double dx = 0, dy = 0;
@@ -303,10 +308,11 @@ public class Player extends Entity {
         gunAngle = Math.atan2(dy, dx);
     }
 
+
     // ---- Phím điều khiển ----
     public void setUp(boolean value) { up = value;
         //System.out.println("hello")
-        ;}
+    }
     public void setDown(boolean value) { down = value; }
     public void setLeft(boolean value) { left = value; }
     public void setRight(boolean value) { right = value; }
@@ -383,6 +389,25 @@ public class Player extends Entity {
 
         return worldPoly;
     }
+    public void shootBullet() {
+        if (bullet <= 0) {
+            System.out.println("Hết đạn!");
+            return;
+        }
+
+        bullet--; // trừ đạn
+
+        double spawnX = x + Math.cos(gunAngle) * 30;
+        double spawnY = y + Math.sin(gunAngle) * 30;
+
+        // bullet là id đạn, ví dụ 1,2,3...
+        Bullet b = new Bullet(spawnX, spawnY, gunAngle, playerName, 1);
+
+        mapLoader.addBullet(b);
+
+        System.out.println("► Player " + playerName + " bắn đạn loại " + 1 + " con lai " + this.bullet + "vie dan");
+    }
+
     public void drawSolidArea(GraphicsContext gc) {
         if (solidArea == null) return;
 
