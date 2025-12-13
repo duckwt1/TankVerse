@@ -17,6 +17,9 @@ public class UiNavigator {
             FXMLLoader loader = new FXMLLoader(UiNavigator.class.getResource(fxml));
             Scene scene = new Scene(loader.load());
             mainStage.setScene(scene);
+            
+            // Set window size to match FXML dimensions
+            mainStage.sizeToScene();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -26,7 +29,12 @@ public class UiNavigator {
         try {
             FXMLLoader loader = new FXMLLoader(UiNavigator.class.getResource(fxml));
             Parent root = loader.load();
-            mainStage.setScene(new Scene(root));
+            Scene scene = new Scene(root);
+            mainStage.setScene(scene);
+            
+            // Set window size to match FXML dimensions
+            mainStage.sizeToScene();
+            
             return loader.getController();
         } catch (Exception e) {
             e.printStackTrace();

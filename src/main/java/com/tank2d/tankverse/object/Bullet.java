@@ -29,9 +29,9 @@ public class Bullet extends GameObject {
         y += dy;
 
         // Ra ngoài màn hình → biến mất
-        if (x < 0 || x > Constant.MAP_WIDTH || y < 0 || y > Constant.MAP_HEIGHT) {
-            active = false;
-        }
+//        if (x < 0 || x > Constant.MAP_WIDTH || y < 0 || y > Constant.MAP_HEIGHT) {
+//            active = false;
+//        }
     }
 
     @Override

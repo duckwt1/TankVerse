@@ -15,21 +15,16 @@ public class Constant {
     public static final int PLAYER_TILE_SIZE = 64;
     
     // Server Configuration (Playit.gg - TCP + UDP)
-    public static final String DEFAULT_SERVER_HOST = "per-mg.gl.at.ply.gg";
-    //public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
-
-    public static final int DEFAULT_SERVER_PORT = 41181;
-    //public static final int DEFAULT_SERVER_PORT = 11640;
-
-
+    public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
+    public static final int DEFAULT_SERVER_PORT = 11640;
 
     // Fallback to localhost for LAN
     public static final String LOCALHOST = "localhost";
     public static final int LOCALHOST_PORT = 11640;
 
-
-    public static final String DEFAULT_RELAY_HOST = "try-crystal.gl.at.ply.gg";
-    public static final int DEFAULT_RELAY_PORT = 65455;
+    // Game Relay Server (UDP)
+    public static final String DEFAULT_RELAY_HOST = "takes-concerts.gl.at.ply.gg";
+    public static final int DEFAULT_RELAY_PORT = 4972;
 
 
     public static final int SHOOT = 1;

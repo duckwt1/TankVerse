@@ -1,106 +1,103 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.PasswordField?>
-<?import javafx.scene.control.TextField?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
 
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity"
-            prefHeight="600.0" prefWidth="800.0"
-            style="-fx-background-color: #8ab48f;"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.tank2d.tankverse.ui.LoginController">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tank2d.tankverse.ui.LoginController">
+
+    <style>
+        -fx-background-color:
+        radial-gradient(center 50% 50%, radius 80%, #a1c4a0 0%, #8ab48f 70%, #6b9080 100%);
+    </style>
 
     <!-- Main Login Container -->
-    <VBox fx:id="loginContainer" alignment="CENTER" layoutX="225.0" layoutY="100.0" prefHeight="400.0" prefWidth="350.0"
-          spacing="15.0" style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 4; -fx-background-radius: 5; -fx-border-radius: 5;">
+    <VBox fx:id="loginContainer" alignment="CENTER" layoutX="290.0" layoutY="41.0" prefHeight="460.0" prefWidth="420.0" spacing="20.0" style="-fx-background-color: #f4e8c1;                  -fx-border-color: #704214;                  -fx-border-width: 6;                  -fx-background-radius: 12;                  -fx-border-radius: 12;                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 20, 0, 0, 10);">
 
         <padding>
-            <Insets bottom="25.0" left="30.0" right="30.0" top="25.0" />
+            <Insets bottom="35" left="40" right="40" top="35" />
         </padding>
 
-        <!-- Game Title -->
-        <Label text="Tank 2D" textFill="#704214">
-            <font>
-                <Font name="System Bold" size="38.0" />
-            </font>
-        </Label>
-
-        <Label text="~ Welcome ~" textFill="#8a6f47">
-            <font>
-                <Font size="16.0" />
-            </font>
-        </Label>
+        <!-- Game Title with Icon -->
+        <VBox alignment="CENTER" spacing="8">
+            <Label text="🎮" textFill="#5d4037">
+                <font>
+                    <Font size="48.0" />
+                </font>
+                <effect><DropShadow color="#8B4513" radius="3" /></effect>
+            </Label>
+            <Label style="-fx-font-weight: bold;" text="TANK 2D" textFill="#704214">
+                <font>
+                    <Font name="System Bold" size="42.0" />
+                </font>
+                <effect><DropShadow color="rgba(244,232,193,0.6)" radius="2" /></effect>
+            </Label>
+            <Label text="━━━ Welcome Back ━━━" textFill="#8a6f47">
+                <font>
+                    <Font size="15.0" />
+                </font>
+            </Label>
+        </VBox>
 
         <!-- Username Field -->
-        <VBox spacing="6.0">
-            <Label text="Username" textFill="#704214">
+        <VBox spacing="8.0">
+            <Label style="-fx-font-weight: bold;" text="USERNAME" textFill="#704214">
                 <font>
                     <Font name="System Bold" size="13.0" />
                 </font>
             </Label>
-            <TextField fx:id="txtUsername" promptText="Enter your name"
-                       prefHeight="38.0"
-                       style="-fx-background-color: white;
-                           -fx-border-color: #8a6f47;
-                           -fx-border-width: 2;
-                           -fx-background-insets: 0;
-                           -fx-border-insets: 0;">
+            <TextField fx:id="txtUsername" prefHeight="45.0" promptText="Enter your username" style="-fx-background-color: white;                               -fx-border-color: #8a6f47;                               -fx-border-width: 2;                               -fx-border-radius: 4;                               -fx-background-radius: 4;">
                 <font>
-                    <Font size="13.0" />
+                    <Font size="14.0" />
                 </font>
             </TextField>
         </VBox>
 
         <!-- Password Field -->
-        <VBox spacing="6.0">
-            <Label text="Password" textFill="#704214">
+        <VBox spacing="8.0">
+            <Label style="-fx-font-weight: bold;" text="PASSWORD" textFill="#704214">
                 <font>
                     <Font name="System Bold" size="13.0" />
                 </font>
             </Label>
-            <PasswordField fx:id="txtPassword" promptText="Enter password"
-                           prefHeight="38.0"
-                           style="-fx-background-color: white;
-                               -fx-border-color: #8a6f47;
-                               -fx-border-width: 2;
-                               -fx-background-insets: 0;
-                               -fx-border-insets: 0;">
+            <PasswordField fx:id="txtPassword" prefHeight="45.0" promptText="Enter your password" style="-fx-background-color: white;                                   -fx-border-color: #8a6f47;                                   -fx-border-width: 2;                                   -fx-border-radius: 4;                                   -fx-background-radius: 4;">
                 <font>
-                    <Font size="13.0" />
+                    <Font size="14.0" />
                 </font>
             </PasswordField>
         </VBox>
 
         <!-- Status Message Label -->
-        <Label fx:id="lblStatus" text="Connecting..." textFill="#c54245" wrapText="true">
+        <Label fx:id="lblStatus" alignment="CENTER" style="-fx-background-color: #fff8e1;                       -fx-background-radius: 6;                       -fx-padding: 6;                       -fx-border-color: #d7ccc8;                       -fx-border-width: 1;                       -fx-border-radius: 6;" text="Ready to connect..." textFill="#c54245" wrapText="true">
             <font>
-                <Font size="11.0" />
+                <Font size="12.0" />
             </font>
         </Label>
 
         <!-- Login Button -->
-        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                onAction="#onLoginClick" prefHeight="42.0" text="Login" textFill="white"
-                style="-fx-background-color: #6b9080;
-                     -fx-border-color: #4a6859;
-                     -fx-border-width: 3;">
+        <Button fx:id="btnLogin" maxWidth="1.7976931348623157E308" onAction="#onLoginClick" prefHeight="50.0" style="-fx-background-color: linear-gradient(to bottom, #7a9c8e, #6b9080);                        -fx-border-color: #4a6859;                        -fx-border-width: 3;                        -fx-background-radius: 8;                        -fx-font-weight: bold;                        -fx-cursor: hand;" text="LOGIN" textFill="white">
             <font>
-                <Font name="System Bold" size="14.0" />
+                <Font name="System Bold" size="16.0" />
             </font>
         </Button>
 
+        <!-- Divider -->
+        <HBox alignment="CENTER" spacing="10">
+            <Label text="─────" textFill="#b8956a">
+                <font><Font size="12.0" /></font>
+            </Label>
+            <Label text="OR" textFill="#8a6f47">
+                <font><Font name="System Bold" size="12.0" /></font>
+            </Label>
+            <Label text="─────" textFill="#b8956a">
+                <font><Font size="12.0" /></font>
+            </Label>
+        </HBox>
+
         <!-- Register Button -->
-        <Button fx:id="btnRegister" maxWidth="1.7976931348623157E308" mnemonicParsing="false"
-                onAction="#onRegisterClick" prefHeight="38.0" text="Create Account"
-                style="-fx-background-color: #d4a574;
-                     -fx-border-color: #a67c52;
-                     -fx-border-width: 3;
-                     -fx-text-fill: white;">
+        <Button fx:id="btnRegister" maxWidth="1.7976931348623157E308" onAction="#onRegisterClick" prefHeight="48.0" style="-fx-background-color: linear-gradient(to bottom, #d9b382, #d4a574);                        -fx-border-color: #a67c52;                        -fx-border-width: 3;                        -fx-background-radius: 8;                        -fx-text-fill: white;                        -fx-font-weight: bold;                        -fx-cursor: hand;" text="CREATE NEW ACCOUNT">
             <font>
                 <Font name="System Bold" size="13.0" />
             </font>
@@ -109,25 +106,19 @@
     </VBox>
 
     <!-- Decorative corner elements -->
-    <Label layoutX="20.0" layoutY="20.0" text="🌾" textFill="#704214">
-        <font>
-            <Font size="24.0" />
-        </font>
+    <Label layoutX="30.0" layoutY="30.0" text="💰" textFill="#d4a017">
+        <font><Font size="32.0" /></font>
+        <effect><DropShadow color="#8B4513" radius="3" /></effect>
     </Label>
-    <Label layoutX="750.0" layoutY="20.0" text="🌻" textFill="#704214">
-        <font>
-            <Font size="24.0" />
-        </font>
+    <Label layoutX="930.0" layoutY="30.0" text="⭐" textFill="#ffb300">
+        <font><Font size="32.0" /></font>
+        <effect><DropShadow color="#8B4513" radius="3" /></effect>
     </Label>
-    <Label layoutX="20.0" layoutY="550.0" text="🌿" textFill="#704214">
-        <font>
-            <Font size="24.0" />
-        </font>
+    <Label layoutX="30.0" layoutY="630.0" text="⚙️" textFill="#5d4037">
+        <font><Font size="30.0" /></font>
     </Label>
-    <Label layoutX="750.0" layoutY="550.0" text="🍄" textFill="#704214">
-        <font>
-            <Font size="24.0" />
-        </font>
+    <Label layoutX="930.0" layoutY="630.0" text="🔥" textFill="#c54245">
+        <font><Font size="30.0" /></font>
     </Label>
 
 </AnchorPane>
