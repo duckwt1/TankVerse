@@ -35,16 +35,11 @@ public class PlayPanel extends Pane implements Runnable {
     private boolean isHost = false;
 
 
-    public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList) {
-        // 🗺️ Lấy mapId từ dữ liệu
-
+    public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList, int mapId) {
         this.userName = userName;
-        int mapId = 3;
-        if (!playerDataList.isEmpty() && playerDataList.get(0).containsKey("mapId")) {
-            mapId = toInt(playerDataList.get(0).get("mapId"));
-        }
-
-
+        
+        // Use mapId from parameter
+        System.out.println("🗺️ Loading map with ID: " + mapId);
         this.mapLoader = new MapLoader(mapId);
         this.canvas = new Canvas(Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
         this.gc = canvas.getGraphicsContext2D();

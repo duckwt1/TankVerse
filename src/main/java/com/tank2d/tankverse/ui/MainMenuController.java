@@ -13,7 +13,7 @@ import java.util.Map;
 public class MainMenuController implements PacketListener {
 
     @FXML private Label lblTitle;
-    @FXML private Button btnCreateRoom, btnJoinRoom, btnShop, btnSettings, btnQuit;
+    @FXML private Button btnCreateRoom, btnJoinRoom, btnShop, btnInventory, btnSettings, btnQuit;
     private GameClient client;
 
     @FXML
@@ -23,6 +23,7 @@ public class MainMenuController implements PacketListener {
         btnCreateRoom.setOnAction(e -> onCreateRoom());
         btnJoinRoom.setOnAction(e -> onJoinRoom());
         btnShop.setOnAction(e -> onShop());
+        btnInventory.setOnAction(e -> onInventory());
         btnSettings.setOnAction(e -> onSettings());
         btnQuit.setOnAction(e -> System.exit(0));
     }
@@ -43,6 +44,15 @@ public class MainMenuController implements PacketListener {
             ShopController controller = UiNavigator.loadSceneWithController("shop.fxml");
             controller.setClient(client);
         });
+    }
+
+    private void onInventory(){
+//        Platform.runLater(() -> {
+//            InventoryController controller = UiNavigator.loadSceneWithController("inventory.fxml");
+//            controller.setClient(client);
+//            // Request inventory data from server
+//            controller.requestInventory();
+//        });
     }
 
     private void onJoinRoom() {

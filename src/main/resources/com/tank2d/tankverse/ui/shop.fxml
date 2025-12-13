@@ -1,139 +1,196 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.effect.DropShadow?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
-<?import javafx.scene.text.Font?>
 
-<?import java.lang.String?>
-<AnchorPane prefHeight="600.0" prefWidth="800.0"
-            style="-fx-background-color: #8ab48f;"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1"
-            fx:controller="com.tank2d.tankverse.ui.ShopController">
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" style="-fx-background-color: #8ab48f;" xmlns="http://javafx.com/javafx/17.0.2-ea" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.tank2d.tankverse.ui.ShopController">
 
     <style>
         -fx-background-color:
-        radial-gradient(center 50% 50%, radius 80%, #a1c4a0 0%, #8ab48f 70%, #6b9080 100%),
-        linear-gradient(to bottom, #f4e8c1 0%, #e6d5a8 100%);
+        radial-gradient(center 50% 50%, radius 80%, #a1c4a0 0%, #8ab48f 70%, #6b9080 100%);
     </style>
 
-    <VBox alignment="TOP_CENTER" layoutX="150.0" layoutY="60.0"
-          prefHeight="480.0" prefWidth="500.0" spacing="18"
-          style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 4; -fx-background-radius: 5; -fx-border-radius: 5;">
+    <VBox alignment="TOP_CENTER" layoutX="50.0" layoutY="30.0" prefHeight="640.0" prefWidth="900.0" spacing="15" style="-fx-background-color: #f4e8c1;                   -fx-border-color: #704214;                   -fx-border-width: 6;                   -fx-background-radius: 12;                   -fx-border-radius: 12;                   -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 20, 0, 0, 10);">
         <padding>
-            <Insets top="25" bottom="25" left="35" right="35"/>
+            <Insets bottom="20" left="30" right="30" top="20" />
         </padding>
 
-        <Label text="🛒  TANK SHOP  🛒" textFill="#5d4037">
-            <font>
-                <Font name="System Bold" size="36" />
-            </font>
-
-        </Label>
-
-        <HBox alignment="CENTER" spacing="12">
-            <Label text="💰 Your Gold:" textFill="#5d4037">
+        <HBox alignment="CENTER" spacing="20">
+            <Label text="🛒" textFill="#5d4037"><font><Font size="32" /></font></Label>
+            <Label text="THE TANKVERSE SHOP" textFill="#704214">
                 <font>
-                    <Font name="System Bold" size="16" />
+                    <Font name="System Bold" size="32" />
                 </font>
+                <effect><DropShadow color="#f4e8c1" radius="1" /></effect>
             </Label>
-            <Label fx:id="lblGold" text="0" textFill="#d4a017">
-                <font>
-                    <Font name="System Bold" size="18" />
-                </font>
-            </Label>
+            <Pane minWidth="10" HBox.hgrow="ALWAYS" />
+
+            <HBox alignment="CENTER" spacing="5" style="-fx-background-color: #fff8e1;                                             -fx-padding: 8 15;                                             -fx-background-radius: 15;                                             -fx-border-color: #704214;                                             -fx-border-width: 2;                                             -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 5, 0, 0, 0);">
+                <ImageView fitHeight="24" fitWidth="24" preserveRatio="true">
+                    <image>
+                        <javafx.scene.image.Image url="@../icon/coin.png" />
+                    </image>
+                </ImageView>
+                <Label fx:id="lblGold" text="0" textFill="#d4a017">
+                    <font>
+                        <Font name="System Bold" size="20" />
+                    </font>
+                </Label>
+            </HBox>
         </HBox>
 
-        <VBox spacing="10" alignment="CENTER">
-<!--            <Label text="📜 Items for Sale:" textFill="#5d4037">-->
-<!--                <font>-->
-<!--                    <Font name="System Bold" size="15" />-->
-<!--                </font>-->
-<!--            </Label>-->
-            <ScrollPane prefHeight="260.0" prefWidth="440.0"
-                        fitToWidth="true" hbarPolicy="NEVER"
-                        style="-fx-background: transparent; -fx-background-color: transparent;">
-                <content>
-                    <ListView fx:id="listShopItems"
-                              style="-fx-background-color: #fdf6e3;
-                                     -fx-background-radius: 8;
-                                     -fx-border-color: #a67c52;
-                                     -fx-border-width: 2;
-                                     -fx-border-radius: 8;
-                                     -fx-padding: 5;
-                                     -fx-effect: innershadow(gaussian, rgba(0,0,0,0.1), 5, 0, 0, 2);">
-                        <!-- Hover effect cho item -->
-                        <styleClass>
-                            <String fx:value="shop-list-view"/>
-                        </styleClass>
-                    </ListView>
-                </content>
-            </ScrollPane>
-        </VBox>
+        <TabPane fx:id="tabPane" style="-fx-tab-min-width: 130px; -fx-tab-max-height: 35px; -fx-padding: 0;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
 
-        <Label fx:id="lblStatus" text="Select an item to see details..."
-               textFill="#6d4c41" wrapText="true" alignment="CENTER"
-               style="-fx-background-color: #fff8e1;
-                      -fx-background-radius: 8;
-                      -fx-padding: 8;
-                      -fx-border-color: #d7ccc8;
-                      -fx-border-width: 1;
-                      -fx-border-radius: 8;">
+            <Tab text="🎁 Items">
+                <HBox spacing="15" style="-fx-padding: 15; -fx-background-color: #f7f0e0;">
+
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: #fff8e1;                                        -fx-background: #fff8e1;" HBox.hgrow="ALWAYS">
+                        <GridPane fx:id="gridShopItems" alignment="TOP_LEFT" hgap="10" style="-fx-padding: 10;" vgap="10">
+                        </GridPane>
+                    </ScrollPane>
+
+                    <VBox fx:id="vboxDetailPanel" prefWidth="280.0" spacing="10" style="-fx-background-color: #fff;                                  -fx-padding: 15;                                  -fx-border-color: #704214;                                  -fx-border-width: 2;                                  -fx-background-radius: 6;                                  -fx-border-radius: 6;                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+
+                        <Label text="✨ ITEM DETAILS" textFill="#704214">
+                            <font><Font name="System Bold" size="14" /></font>
+                        </Label>
+                        <Separator />
+
+                        <HBox alignment="TOP_LEFT" spacing="10">
+                            <StackPane alignment="CENTER" prefHeight="90" prefWidth="90" style="-fx-background-color: #d4a574;                                               -fx-background-radius: 4;                                               -fx-border-color: #704214;                                               -fx-border-width: 1;">
+                                <ImageView fx:id="imgDetailItem" fitHeight="80.0" fitWidth="80.0" preserveRatio="true" />
+                                <Label fx:id="lblImagePlaceholder" text="[Image]" textFill="#fff">
+                                    <font><Font size="10" /></font>
+                                </Label>
+                            </StackPane>
+
+                            <VBox spacing="3" VBox.vgrow="ALWAYS">
+                                <Label fx:id="lblDetailName" maxHeight="60" maxWidth="340" text="Select an item to view details" textFill="#5d4037" wrapText="true">
+                                    <font><Font name="System Bold" size="16" /></font>
+                                </Label>
+                                <HBox alignment="CENTER_LEFT" spacing="3">
+                                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                                        <image>
+                                            <Image url="@../icon/coin.png" />
+                                        </image>
+                                    </ImageView>
+                                    <Label fx:id="lblDetailPrice" text="--" textFill="#d4a017" wrapText="true">
+                                        <font><Font name="System Bold" size="15" /></font>
+                                    </Label>
+                                </HBox>
+                                <Label fx:id="lblDetailType" text="Type: ---" textFill="#8a6f47" wrapText="true">
+                                    <font><Font size="13" /></font>
+                                </Label>
+                            </VBox>
+                        </HBox>
+
+                        <Separator />
+
+                        <Label text="📝 Description / Stats:" textFill="#704214">
+                            <font><Font name="System Bold" size="13" /></font>
+                        </Label>
+
+                        <VBox spacing="5" style="-fx-padding: 8; -fx-background-color: #fff8e1; -fx-border-color: #d7ccc8; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;" VBox.vgrow="ALWAYS">
+                            <Label fx:id="lblDetailStats" text="Stats and detailed description will appear here..." textFill="#5d4037" wrapText="true">
+                                <font><Font size="13" /></font>
+                            </Label>
+                        </VBox>
+
+                    </VBox>
+                </HBox>
+            </Tab>
+
+            <Tab text="🚗 Tanks">
+                <HBox spacing="15" style="-fx-padding: 15; -fx-background-color: #f7f0e0;">
+
+                    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background-color: #fff8e1;                                        -fx-background: #fff8e1;" HBox.hgrow="ALWAYS">
+                        <GridPane fx:id="gridShopTanks" alignment="TOP_LEFT" hgap="10" style="-fx-padding: 10;" vgap="10">
+                        </GridPane>
+                    </ScrollPane>
+
+                    <VBox fx:id="vboxDetailPanelTank" prefWidth="380" spacing="10" style="-fx-background-color: #fff;                                  -fx-padding: 15;                                  -fx-border-color: #704214;                                  -fx-border-width: 2;                                  -fx-background-radius: 6;                                  -fx-border-radius: 6;                                  -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);">
+
+                        <Label text="🔥 TANK SPECIFICATIONS" textFill="#704214">
+                            <font><Font name="System Bold" size="14" /></font>
+                        </Label>
+                        <Separator />
+
+                        <HBox alignment="TOP_LEFT" spacing="10">
+                            <StackPane alignment="CENTER" prefHeight="90" prefWidth="90" style="-fx-background-color: #d4a574;                                               -fx-background-radius: 4;                                               -fx-border-color: #704214;                                               -fx-border-width: 1;">
+                                <ImageView fx:id="imgDetailTank" fitHeight="80.0" fitWidth="80.0" preserveRatio="true" />
+                                <Label textFill="#fff"><font><Font size="10" /></font></Label>
+                            </StackPane>
+
+                            <VBox spacing="3" VBox.vgrow="ALWAYS">
+                                <Label fx:id="lblDetailTankName" maxHeight="60" maxWidth="340" text="Select a tank to view specs" textFill="#5d4037" wrapText="true">
+                                    <font><Font name="System Bold" size="16" /></font>
+                                </Label>
+                                <HBox alignment="CENTER_LEFT" spacing="3">
+                                    <ImageView fitHeight="18" fitWidth="18" preserveRatio="true">
+                                        <image>
+                                            <Image url="@../icon/coin.png" />
+                                        </image>
+                                    </ImageView>
+                                    <Label fx:id="lblDetailTankPrice" text="--" textFill="#d4a017" wrapText="true">
+                                        <font><Font name="System Bold" size="15" /></font>
+                                    </Label>
+                                </HBox>
+                                <Label fx:id="lblDetailTankClass" text="Class: Heavy" textFill="#8a6f47" wrapText="true">
+                                    <font><Font size="13" /></font>
+                                </Label>
+                            </VBox>
+                        </HBox>
+
+                        <Separator />
+
+                        <Label text="📊 Base Stats:" textFill="#704214">
+                            <font><Font name="System Bold" size="13" /></font>
+                        </Label>
+
+                        <VBox spacing="5" style="-fx-padding: 8; -fx-background-color: #fff8e1; -fx-border-color: #d7ccc8; -fx-border-width: 1; -fx-border-radius: 4; -fx-background-radius: 4;" VBox.vgrow="ALWAYS">
+                            <Label fx:id="lblDetailTankStats" text="Tank specifications will appear here (Health, Damage, Speed)..." textFill="#5d4037" wrapText="true">
+                                <font><Font size="13" /></font>
+                            </Label>
+                        </VBox>
+
+                    </VBox>
+                </HBox>
+            </Tab>
+
+        </TabPane>
+
+        <Label fx:id="lblStatus" alignment="CENTER" style="-fx-background-color: #fff8e1;                       -fx-background-radius: 8;                       -fx-padding: 8;                       -fx-border-color: #d7ccc8;                       -fx-border-width: 1;                       -fx-border-radius: 8;" text="Select an item or tank to purchase." textFill="#6d4c41" wrapText="true">
             <font>
                 <Font name="Georgia" size="13" />
             </font>
         </Label>
 
-        <HBox spacing="15" alignment="CENTER">
-            <Button fx:id="btnBuy" mnemonicParsing="false"
-                    onAction="#onBuy" prefHeight="45" prefWidth="150" text="BUY"
-                    style="-fx-background-color: #6b9080;
-                        -fx-border-color: #4a6859;
-                        -fx-border-width: 3;
-                        -fx-text-fill: white;">
-                <font>
-                    <Font name="System Bold" size="15" />
-                </font>
-                <!-- Hover effect -->
-                <style>
-                    -fx-cursor: hand;
-                </style>
+        <HBox alignment="CENTER" spacing="15">
+            <Button fx:id="btnBuy" mnemonicParsing="false" onAction="#onBuy" prefHeight="45" prefWidth="180" style="-fx-background-color: linear-gradient(to bottom, #7a9c8e, #6b9080);                         -fx-border-color: #4a6859;                         -fx-border-width: 3;                         -fx-text-fill: white;                         -fx-font-size: 16;                         -fx-font-weight: bold;                         -fx-background-radius: 8;                         -fx-cursor: hand;" text="PURCHASE ITEM">
             </Button>
 
-            <Button fx:id="btnClose" mnemonicParsing="false"
-                    onAction="#onClose" prefHeight="45" prefWidth="150" text="CLOSE"
-                    style="-fx-background-color: #c54245;
-                        -fx-border-color: #8b2e31;
-                        -fx-border-width: 3;
-                        -fx-text-fill: white;">
-                <font>
-                    <Font name="System Bold" size="15" />
-                </font>
-                <style>
-                    -fx-cursor: hand;
-                </style>
+            <Button fx:id="btnClose" mnemonicParsing="false" onAction="#onClose" prefHeight="45" prefWidth="120" style="-fx-background-color: linear-gradient(to bottom, #d95e61, #c54245);                         -fx-border-color: #8b2e31;                         -fx-border-width: 3;                         -fx-text-fill: white;                         -fx-font-size: 16;                         -fx-font-weight: bold;                         -fx-background-radius: 8;                         -fx-cursor: hand;" text="CLOSE">
             </Button>
         </HBox>
     </VBox>
 
-    <Label layoutX="30" layoutY="30" text="🛒" textFill="#5d4037">
-        <font><Font size="32"/></font>
-        <effect><DropShadow color="#3e2723" radius="3"/></effect>
+    <Label layoutX="30" layoutY="30" text="💰" textFill="#d4a017">
+        <font><Font size="32" /></font>
+        <effect><DropShadow color="#8B4513" radius="3" /></effect>
     </Label>
-    <Label layoutX="730" layoutY="30" text="💰" textFill="#d4a017">
-        <font><Font size="32"/></font>
-        <effect><DropShadow color="#8B4513" radius="3"/></effect>
+    <Label layoutX="730" layoutY="30" text="⭐" textFill="#ffb300">
+        <font><Font size="32" /></font>
+        <effect><DropShadow color="#8B4513" radius="3" /></effect>
     </Label>
-    <Label layoutX="30" layoutY="540" text="⚙️" textFill="#5d4037">
-        <font><Font size="30"/></font>
-    </Label>
-    <Label layoutX="730" layoutY="540" text="✨" textFill="#ffb300">
-        <font><Font size="30"/></font>
-    </Label>
+<!--    <Label layoutX="30" layoutY="540" text="⚙️" textFill="#5d4037">-->
+<!--        <font><Font size="30" /></font>-->
+<!--    </Label>-->
+<!--    <Label layoutX="730" layoutY="540" text="🔥" textFill="#c54245">-->
+<!--        <font><Font size="30" /></font>-->
+<!--    </Label>-->
 
 </AnchorPane>
