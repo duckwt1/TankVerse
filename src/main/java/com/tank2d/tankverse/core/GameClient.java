@@ -8,6 +8,7 @@ import com.tank2d.tankverse.utils.PacketType;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -20,8 +21,8 @@ public class GameClient {
     private BufferedReader in;
     private BufferedWriter out;
     private PacketListener listener;
-    //private GameMiniServer miniServer;
-    //private GameClientUDP udpClient;
+    //    private GameMiniServer miniServer;
+//    private GameClientUDP udpClient;
     private String userName;
     private final Gson gson = new Gson();
 
@@ -72,16 +73,26 @@ public class GameClient {
                         int id = toInt(p.data.get("roomId"));
                         int maxPlayers = toInt(p.data.get("maxPlayers"));
                         List<String> players = (List<String>) p.data.get("players");
+                        String selectedMap = (String) p.data.getOrDefault("selectedMap", "map1");
                         listener.onRoomJoined(id, name, maxPlayers, players);
+                        // Notify about current map selection
+                        if (selectedMap != null) {
+                            listener.onMapSelected(selectedMap);
+                        }
                     }
                     case ROOM_UPDATE -> {
                         String message = (String) p.data.get("msg");
                         List<String> players = (List<String>) p.data.get("players");
-                        listener.onRoomUpdate(message, players);
+                        int maxPlayers = toInt(p.data.getOrDefault("maxPlayers", 4));
+                        listener.onRoomUpdate(message, players, maxPlayers);
                     }
                     case ROOM_LIST_DATA -> {
                         List<Map<String, Object>> rooms = (List<Map<String, Object>>) p.data.get("rooms");
                         listener.onRoomListReceived(rooms);
+                    }
+                    case MAP_SELECTED -> {
+                        String mapName = (String) p.data.get("map");
+                        listener.onMapSelected(mapName);
                     }
                     case START_GAME -> listener.onGameStart(p);
                     case SHOP_LIST_DATA -> {
@@ -97,6 +108,27 @@ public class GameClient {
                     case BUY_FAIL -> {
                         String msg = (String) p.data.get("msg");
                         listener.onBuyFail(msg);
+                    }
+                    case INVENTORY_DATA -> {
+                        List<Map<String, Object>> tanks = (List<Map<String, Object>>) p.data.get("tanks");
+                        List<Map<String, Object>> items = (List<Map<String, Object>>) p.data.get("items");
+                        int gold = toInt(p.data.getOrDefault("gold", 0));
+                        listener.onInventoryReceived(tanks != null ? tanks : new ArrayList<>(),
+                                items != null ? items : new ArrayList<>(),
+                                gold);
+                    }
+                    case TANK_SHOP_LIST_DATA -> {
+                        List<Map<String, Object>> tanks = (List<Map<String, Object>>) p.data.get("tanks");
+                        int gold = toInt(p.data.getOrDefault("gold", 0));
+                        listener.onTankShopDataReceived(tanks != null ? tanks : new ArrayList<>(), gold);
+                    }
+                    case EQUIP_TANK_SUCCESS -> {
+                        int tankId = toInt(p.data.get("tankId"));
+                        listener.onEquipTankSuccess(tankId);
+                    }
+                    case EQUIP_TANK_FAIL -> {
+                        String msg = (String) p.data.get("msg");
+                        listener.onEquipTankFail(msg);
                     }
                 }
             }

@@ -405,7 +405,7 @@ public class Player extends Entity {
 
         mapLoader.addBullet(b);
 
-        System.out.println("► Player " + playerName + " bắn đạn loại " + 1 + " con lai " + this.bullet + "vie dan");
+        //System.out.println("► Player " + playerName + " bắn đạn loại " + 1 + " con lai " + this.bullet + "vie dan");
     }
 
     public void drawSolidArea(GraphicsContext gc) {

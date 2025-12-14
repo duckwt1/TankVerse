@@ -93,7 +93,9 @@ public class PlayPanel extends Pane implements Runnable {
             found.setBackward(playerState.backward);
             found.hp = playerState.hp;
             found.bullet = playerState.bullet;
-            found.action = playerState.action;
+            if (found.action != Constant.ACTION_NONE)
+                System.out.println(found.action);
+                found.action = playerState.action;
         }
     }
 
@@ -119,7 +121,7 @@ public class PlayPanel extends Pane implements Runnable {
         setOnMouseClicked(e -> {
             requestFocus(); // clicking will give focus
             player.action = Constant.ACTION_SHOOT;
-            System.out.println("PlayPanel clicked -> requestFocus()");
+            //System.out.println("PlayPanel clicked -> requestFocus()");
         });
 
         // When scene/window shows, request focus automatically

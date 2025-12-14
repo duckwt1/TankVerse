@@ -78,10 +78,7 @@ public class GameRelayClient extends Thread {
 
             if (now - last >= interval) {
                 Player player = playPanel.getPlayer();
-                if (player.action == Constant.ACTION_CHARGE)
-                {
-                    player.action = Constant.ACTION_NONE;
-                }
+
                 String msg = "UPDATE " + roomId + " " + username + " " +
                         player.getX() + " " +
                         player.getY() + " " +
@@ -99,10 +96,13 @@ public class GameRelayClient extends Thread {
 
                 sendRaw(msg);
                 last = now;
-
-                count++;
-                if (count % 200 == 0)
-                    System.out.println("[RelayClient] Sent " + count + " updates");
+                if (player.action == Constant.ACTION_CHARGE)
+                {
+                    player.action = Constant.ACTION_NONE;
+                }
+                //count++;
+                //if (count % 200 == 0)
+                    //System.out.println("[RelayClient] Sent " + count + " updates");
             }
 
             try { Thread.sleep(1); } catch (Exception ignored) {}

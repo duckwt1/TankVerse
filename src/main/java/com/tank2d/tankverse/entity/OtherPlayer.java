@@ -85,9 +85,9 @@ public class OtherPlayer extends Entity{
 
     @Override
     public void update() {
-        if (this.action == Constant.ACTION_CHARGE)
+        if (this.action == Constant.ACTION_CHARGE || this.action == Constant.ACTION_SHOOT)
         {
-            System.out.println("avasvcs");
+            //System.out.println("avasvcs");
             shootBullet();
             this.action = Constant.ACTION_NONE;
         }
@@ -332,7 +332,7 @@ public class OtherPlayer extends Entity{
         double spawnY = y + Math.sin(gunAngle) * 30;
 
         // bullet là id đạn, ví dụ 1,2,3...
-        Bullet b = new Bullet(spawnX, spawnY, gunAngle, playerName, this.bullet);
+        Bullet b = new Bullet(spawnX, spawnY, gunAngle, playerName, 1);
 
         mapLoader.addBullet(b);
 

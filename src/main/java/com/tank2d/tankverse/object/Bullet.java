@@ -41,7 +41,7 @@ public class Bullet extends GameObject {
         // Kiểm tra collision
         if (map.checkBulletCollision(bulletPoly)) {
             active = false;
-            System.out.println("💥 Bullet hit a wall!");
+            //System.out.println("💥 Bullet hit a wall!");
         }
 
         // Out of screen
