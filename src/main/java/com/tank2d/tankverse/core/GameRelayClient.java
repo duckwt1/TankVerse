@@ -124,6 +124,7 @@ public class GameRelayClient extends Thread {
                 socket.receive(pkt);
 
                 String msg = new String(pkt.getData(), 0, pkt.getLength()).trim();
+                System.out.println("receive data " + msg);
 
                 // accept STATE only
                 if (msg.startsWith("STATE ")) {

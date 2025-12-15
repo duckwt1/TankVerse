@@ -4,6 +4,7 @@ import com.tank2d.tankverse.core.*;
 import com.tank2d.tankverse.net.P2PConnection;
 import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.Packet;
+import com.tank2d.tankverse.utils.PacketType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
@@ -15,6 +16,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
+import java.net.DatagramSocket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -24,7 +27,7 @@ public class WaitingRoomController implements PacketListener {
     @FXML private Label lblPlayerCount;
     @FXML private Label lblStatus;
     @FXML private ListView<String> listPlayers;
-    
+
     // Map selection UI components - using new template-based design
     @FXML private VBox mapSelectionContainer;
     @FXML private ImageView imgCurrentMap;
@@ -32,7 +35,7 @@ public class WaitingRoomController implements PacketListener {
     @FXML private Label lblSelectedMap;
     @FXML private Button btnPrevMap;
     @FXML private Button btnNextMap;
-    
+
     @FXML private Button btnReady;
     @FXML private Button btnStartGame;
     @FXML private Button btnLeaveRoom;
@@ -49,7 +52,70 @@ public class WaitingRoomController implements PacketListener {
     public void setClient(GameClient client) {
         this.client = client;
         client.setPacketListener(this);
+        reportUdpPortOnce();
+
     }
+    // Thêm field vào class WaitingRoomController
+    private DatagramSocket udpSocket; // Để báo cáo port
+
+    // Trong onGameStart(), trước khi tạo LanP2PClient, báo cáo UDP port
+    @Override
+    public void onGameStart(Packet p) {
+        Platform.runLater(() -> {
+            lblStatus.setText((String) p.data.get("msg"));
+
+            String hostUsername = p.data.getOrDefault("isHost", "none").toString();
+            String myUsername = client.getUserName();
+            boolean isHostNow = hostUsername.equals(myUsername);
+
+            List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
+            int mapId = getInt(p.data.getOrDefault("mapId", 1), 1);
+
+
+            // === NHẬN DANH SÁCH PEERS TỪ SERVER ===
+            List<Map<String, Object>> peers = (List<Map<String, Object>>) p.data.get("peers");
+            if (peers == null || peers.isEmpty()) {
+                System.out.println("[Client] WARNING: No peers received from server!");
+                peers = new ArrayList<>();
+            }
+
+            // Tạo PlayPanel
+            PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId);
+
+            Stage stage = (Stage) lblStatus.getScene().getWindow();
+            Scene scene = new Scene(playPanel);
+            stage.setScene(scene);
+            stage.show();
+
+            // Khởi động P2P với danh sách peers từ server
+            LanP2PClient p2p = new LanP2PClient(playPanel, udpSocket, peers);
+            p2p.start();
+
+
+            new Thread(playPanel).start();
+        });
+    }
+    private void reportUdpPortOnce() {
+        try {
+            if (udpSocket == null || udpSocket.isClosed()) {
+                udpSocket = new DatagramSocket(
+                        new java.net.InetSocketAddress("0.0.0.0", 0)
+                );
+            }
+
+            int port = udpSocket.getLocalPort();
+
+            Packet report = new Packet(PacketType.REPORT_UDP_ENDPOINT);
+            report.data.put("udpPort", port);
+            client.sendPacket(report);
+
+            System.out.println("[Client] UDP READY @ " + udpSocket.getLocalAddress() + ":" + port);
+
+        } catch (Exception e) {
+            System.err.println("[Client] UDP report failed: " + e.getMessage());
+        }
+    }
+
 
     public void setRoomData(int roomId, String roomName, int maxPlayers) {
         this.roomId = roomId;
@@ -62,13 +128,16 @@ public class WaitingRoomController implements PacketListener {
         this.isHost = host;
         btnStartGame.setVisible(host);
         btnReady.setVisible(!host);
-        
+
         // Show map selection for both host and players
         mapSelectionContainer.setVisible(true);
-        
+
         // Hide next/prev buttons for non-host (cleaner look)
         btnPrevMap.setVisible(host);
         btnNextMap.setVisible(host);
+//        if (host) {
+//            reportUdpPortOnce(); // 🔥 HOST CŨNG PHẢI BÁO
+//        }
     }
 
     @FXML
@@ -76,7 +145,7 @@ public class WaitingRoomController implements PacketListener {
         lblStatus.setText("Waiting for other players...");
         btnReady.setVisible(false);
         btnStartGame.setVisible(false);
-        
+
         // Debug ListView
         if (listPlayers != null) {
             System.out.println("[WaitingRoom] ListView initialized successfully");
@@ -87,11 +156,12 @@ public class WaitingRoomController implements PacketListener {
         } else {
             System.out.println("[WaitingRoom] ERROR: ListView is NULL after initialization!");
         }
-        
+
         // Initialize map display
         updateMapDisplay();
+
     }
-    
+
     private void updateMapDisplay() {
         try {
             if (imgCurrentMap != null && lblCurrentMapName != null) {
@@ -100,11 +170,11 @@ public class WaitingRoomController implements PacketListener {
                 if (mapImage != null) {
                     imgCurrentMap.setImage(mapImage);
                 }
-                
+
                 // Update map name
                 String mapName = "Map " + (currentMapIndex + 1);
                 lblCurrentMapName.setText(mapName);
-                
+
                 if (lblSelectedMap != null) {
                     lblSelectedMap.setText("Selected Map: " + mapName);
                 }
@@ -113,7 +183,7 @@ public class WaitingRoomController implements PacketListener {
             System.out.println("[WaitingRoom] Could not update map display: " + e.getMessage());
         }
     }
-    
+
     private Image loadMapImage(int mapId) {
         try {
             // Try to load preview image
@@ -124,28 +194,28 @@ public class WaitingRoomController implements PacketListener {
         } catch (Exception e) {
             System.out.println("[WaitingRoom] Preview image not found for map " + mapId);
         }
-        
+
         // Fallback: create placeholder text image or use default
         return createPlaceholderImage("Map " + mapId);
     }
-    
+
     private Image createPlaceholderImage(String text) {
         // Create a simple colored placeholder
         // You can improve this with actual image generation if needed
         return null; // Will just show empty ImageView
     }
-    
+
     private void showMapPreview(int index) {
         showMapPreview(index, true);
     }
-    
+
     private void showMapPreview(int index, boolean sendToServer) {
         currentMapIndex = index;
         selectedMap = "map" + (index + 1);
-        
+
         // Update the display
         updateMapDisplay();
-        
+
         // Only send to server if this is a user action (not from server broadcast)
         if (sendToServer && isHost && client != null && !isUpdatingFromServer) {
             Packet packet = new Packet(com.tank2d.tankverse.utils.PacketType.SELECT_MAP);
@@ -154,33 +224,33 @@ public class WaitingRoomController implements PacketListener {
             System.out.println("[WaitingRoom] Host selected map: " + selectedMap);
         }
     }
-    
+
     @FXML
     private void onPreviousMap() {
         if (!isHost) return; // Safety check
         currentMapIndex = (currentMapIndex - 1 + 3) % 3; // Wrap around
         showMapPreview(currentMapIndex);
     }
-    
+
     @FXML
     private void onNextMap() {
         if (!isHost) return; // Safety check
         currentMapIndex = (currentMapIndex + 1) % 3; // Wrap around
         showMapPreview(currentMapIndex);
     }
-    
+
     @FXML
     private void onSelectMap1() {
         if (!isHost) return; // Safety check
         showMapPreview(0);
     }
-    
+
     @FXML
     private void onSelectMap2() {
         if (!isHost) return; // Safety check
         showMapPreview(1);
     }
-    
+
     @FXML
     private void onSelectMap3() {
         if (!isHost) return; // Safety check
@@ -276,8 +346,13 @@ public class WaitingRoomController implements PacketListener {
             setRoomData(roomId, roomName, maxPlayers);
             setHost(false);
             updatePlayerList(players);
+
+            // ✅ GỬI UDP REPORT CHO MỌI CLIENT (HOST / NON-HOST)
+            //reportUdpPortOnce();
         });
     }
+
+
 
     @Override
     public void onRoomUpdate(String message, List<String> players, int maxPlayers) {
@@ -287,14 +362,14 @@ public class WaitingRoomController implements PacketListener {
                 this.maxPlayers = maxPlayers;
                 System.out.println("[WaitingRoom] Updated maxPlayers to: " + maxPlayers);
             }
-            
+
             lblStatus.setText("[ROOM] " + message);
             if (players != null) {
                 updatePlayerList(players);
             }
         });
     }
-    
+
     @Override
     public void onMapSelected(String mapName) {
         Platform.runLater(() -> {
@@ -314,50 +389,6 @@ public class WaitingRoomController implements PacketListener {
         });
     }
 
-    @Override
-    public void onGameStart(Packet p) {
-        Platform.runLater(() -> {
-            lblStatus.setText((String) p.data.get("msg"));
-            
-            String hostUsername = p.data.getOrDefault("isHost", "none").toString();
-            String myUsername = client.getUserName();
-            boolean isHost = hostUsername.equals(myUsername);
-            
-            System.out.println("===========================================");
-            System.out.println("[START_GAME] MY USERNAME: " + myUsername);
-            System.out.println("[START_GAME] HOST USERNAME: " + hostUsername);
-            System.out.println("[START_GAME] AM I HOST? " + isHost);
-            System.out.println("===========================================");
-            
-            List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
-            
-            // Get mapId from server
-            int mapId = getInt(p.data.getOrDefault("mapId", 1), 1);
-            System.out.println("[START_GAME] Selected Map ID: " + mapId);
-
-            // Create the play panel with player list and mapId
-            PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId);
-
-            Stage stage = (Stage) lblStatus.getScene().getWindow();
-            Scene scene = new Scene(playPanel);
-            stage.setScene(scene);
-            stage.show();
-
-            // Get relay server info
-            String relayHost = Constant.DEFAULT_RELAY_HOST;
-            int relayPort = Constant.DEFAULT_RELAY_PORT;
-            int roomId = getInt(p.data.getOrDefault("room_id", 1), 1);
-            
-            System.out.println("[Game] Relay Server: " + relayHost + ":" + relayPort + " (Room " + roomId + ")");
-
-            // Start relay client (same for host and non-host)
-            GameRelayClient relayClient = new GameRelayClient(playPanel, relayHost, relayPort, roomId);
-            relayClient.start();
-            System.out.println("[Game] Started GameRelayClient");
-
-            new Thread(playPanel).start();
-        });
-    }
 
 
     @Override

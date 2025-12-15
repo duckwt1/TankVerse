@@ -93,9 +93,7 @@ public class PlayPanel extends Pane implements Runnable {
             found.setBackward(playerState.backward);
             found.hp = playerState.hp;
             found.bullet = playerState.bullet;
-            if (found.action != Constant.ACTION_NONE)
-                System.out.println(found.action);
-                found.action = playerState.action;
+            found.action = playerState.action;
         }
     }
 

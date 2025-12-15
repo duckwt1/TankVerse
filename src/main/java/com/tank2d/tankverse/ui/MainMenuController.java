@@ -2,11 +2,14 @@ package com.tank2d.tankverse.ui;
 
 import com.tank2d.tankverse.core.GameClient;
 import com.tank2d.tankverse.core.PacketListener;
+import com.tank2d.tankverse.utils.Packet;
+import com.tank2d.tankverse.utils.PacketType;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 
+import java.net.DatagramSocket;
 import java.util.List;
 import java.util.Map;
 
@@ -68,11 +71,15 @@ public class MainMenuController implements PacketListener {
 //        UiNavigator.loadScene("settings.fxml");
     }
 
+    private DatagramSocket udpSocket;
+
     public void setClient(GameClient client) {
         this.client = client;
         client.setPacketListener(this);
+
+
     }
-    
+
     // ========== PacketListener Implementation ==========
     
     @Override
