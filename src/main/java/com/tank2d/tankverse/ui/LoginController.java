@@ -26,41 +26,69 @@ public class LoginController implements PacketListener {
 
     @FXML
     public void initialize() {
-        // Fade in animation on load
         if (loginContainer != null) {
             loginContainer.setOpacity(0);
             AnimationHelper.fadeIn(loginContainer, 500);
         }
-        
-        // Auto-connect to default Playit server
-        connectToServerAsync(Constant.DEFAULT_SERVER_HOST, Constant.DEFAULT_SERVER_PORT);
+
+        // Auto-connect LAN server
+        connectToServerAsync(
+                Constant.LAN_SERVER_HOST,
+                Constant.LAN_SERVER_PORT
+        );
     }
-    
-    private void connectToServerAsync(String host, int port) {
-        lblStatus.setText("Connecting to server...");
+
+    private void connectToServerAsync(String lanHost, int port) {
+        lblStatus.setText("Connecting to LAN server...");
         isConnected = false;
-        
-        // Connect in background thread
+
         new Thread(() -> {
+            try {
+                // ===== TRY LAN FIRST =====
+                System.out.println("[CLIENT] Try LAN " + lanHost + ":" + port);
+
+                client = new GameClient();
+                client.setPacketListener(this);
+                client.connect(lanHost, port);
+
+                // SUCCESS
+                isConnected = true;
+                Platform.runLater(() ->
+                        lblStatus.setText("Connected (LAN)")
+                );
+                System.out.println("[CLIENT] Connected via LAN");
+                return;
+
+            } catch (Exception lanFail) {
+                System.out.println("[CLIENT] LAN failed → fallback localhost");
+                lanFail.printStackTrace();
+            }
+
+            // ===== FALLBACK LOCALHOST =====
             try {
                 client = new GameClient();
                 client.setPacketListener(this);
-                client.connect(host, port);
-                
+
+                System.out.println("[CLIENT] Try localhost");
+
+                client.connect("127.0.0.1", port);
+
                 isConnected = true;
-                
-                Platform.runLater(() -> {
-                    lblStatus.setText("Connected to server");
-                });
-                
-            } catch (Exception e) {
+                Platform.runLater(() ->
+                        lblStatus.setText("Connected (Localhost)")
+                );
+                System.out.println("[CLIENT] Connected via localhost");
+
+            } catch (Exception localFail) {
                 isConnected = false;
-                Platform.runLater(() -> {
-                    lblStatus.setText("Connection failed: " + e.getMessage());
-                });
+                Platform.runLater(() ->
+                        lblStatus.setText("Connection failed (LAN + Local)")
+                );
+                localFail.printStackTrace();
             }
         }).start();
     }
+
 
     @FXML
     public void onLoginClick() {

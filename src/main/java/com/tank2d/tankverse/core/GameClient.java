@@ -30,11 +30,24 @@ public class GameClient {
 
     // --- Connection setup ---
     public void connect(String host, int port) throws Exception {
-        socket = new Socket(host, port);
-        in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        out = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+        socket = new Socket();
+
+        // ⚠ timeout để tránh treo vô hạn
+        socket.connect(
+                new java.net.InetSocketAddress(host, port),
+                3000 // 3 giây
+        );
+
+        in = new BufferedReader(
+                new InputStreamReader(socket.getInputStream())
+        );
+        out = new BufferedWriter(
+                new OutputStreamWriter(socket.getOutputStream())
+        );
+
         new Thread(this::listen).start();
     }
+
 
     // --- Sending packets ---
     public void sendPacket(Packet p) {

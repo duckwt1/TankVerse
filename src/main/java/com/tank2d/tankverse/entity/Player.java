@@ -194,10 +194,13 @@ public class Player extends Entity {
 
         // ===== MOVEMENT =====
         if (willCollide(x + dx, y + dy, bodyAngle)) {
-            System.out.println("collide");
+            //System.out.println("collide");
             return;
         }
-
+        if (mapLoader.checkPlayerBulletCollision(this))
+        {
+            System.out.println("get hit");
+        }
         double nextX = x + dx;
         double nextY = y + dy;
 

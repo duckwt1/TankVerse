@@ -20,16 +20,15 @@ public class Constant {
     public static final int ACTION_ABC = 3;
 
     // Server Configuration (Playit.gg - TCP + UDP)
-    public static final String DEFAULT_SERVER_HOST = "per-mg.gl.at.ply.gg";
-    //public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
-
-    public static final int DEFAULT_SERVER_PORT = 41181;
+//    public static final String DEFAULT_SERVER_HOST = "per-mg.gl.at.ply.gg";
+//    //public static final String DEFAULT_SERVER_HOST = "restaurants-expenditures.gl.at.ply.gg";
+//
+//    public static final int DEFAULT_SERVER_PORT = 41181;
     //public static final int DEFAULT_SERVER_PORT = 11640;
 
 
-    // Fallback to localhost for LAN
-    public static final String LOCALHOST = "localhost";
-    public static final int LOCALHOST_PORT = 11640;
+    public static final String LAN_SERVER_HOST = "192.168.1.10"; // ĐỔI THEO MÁY BẠN
+    public static final int LAN_SERVER_PORT = 11640;
 
 
     public static final String DEFAULT_RELAY_HOST = "try-crystal.gl.at.ply.gg";

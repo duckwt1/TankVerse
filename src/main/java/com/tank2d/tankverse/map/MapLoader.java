@@ -341,6 +341,27 @@ public class MapLoader {
 
         return false;
     }
+    public boolean checkPlayerBulletCollision(Player player) {
+
+        Polygon playerPoly = player.solidArea;
+        if (playerPoly == null) return false;
+
+        for (Bullet b : bullets) {
+            if (!b.isActive()) continue;
+
+            Polygon bulletPoly = b.getPolygon(); // ⚠ đổi tên nếu bạn dùng tên khác
+            if (bulletPoly == null) continue;
+
+            Area a = new Area(playerPoly);
+            a.intersect(new Area(bulletPoly));
+
+            if (!a.isEmpty()) {
+                b.setActive(false);   // bullet biến mất
+                return true;          // player trúng đạn
+            }
+        }
+        return false;
+    }
 
 
     public boolean checkCollision(double x, double y, Entity player) {

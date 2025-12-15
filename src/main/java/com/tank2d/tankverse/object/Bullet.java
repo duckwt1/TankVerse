@@ -6,13 +6,15 @@ import com.tank2d.tankverse.utils.Constant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
+import java.awt.*;
+
 public class Bullet extends GameObject {
 
     private double angle;
     private double speed = 12;
     private String ownerName;
     private boolean active = true;
-
+    private Polygon polygon;
     public Bullet(double x, double y, double angle, String ownerName, int bulletId) {
         super(x, y, new Image(Bullet.class.getResourceAsStream(
                 "/com/tank2d/tankverse/bullet/bullet" + bulletId + ".png"
@@ -32,14 +34,14 @@ public class Bullet extends GameObject {
         y += Math.sin(angle) * speed;
 
         // Bullet polygon = 1 điểm, nhưng convert thành polygon 2x2 để tránh lỗi
-        java.awt.Polygon bulletPoly = new java.awt.Polygon(
+        polygon = new java.awt.Polygon(
                 new int[]{(int)x, (int)x+2, (int)x+2, (int)x},
                 new int[]{(int)y, (int)y, (int)y+2, (int)y+2},
                 4
         );
 
         // Kiểm tra collision
-        if (map.checkBulletCollision(bulletPoly)) {
+        if (map.checkBulletCollision(polygon)) {
             active = false;
             //System.out.println("💥 Bullet hit a wall!");
         }
@@ -69,6 +71,13 @@ public class Bullet extends GameObject {
         gc.restore();
     }
 
+    public void setActive(boolean active) {
+        this.active = active;
+    }
+
+    public Polygon getPolygon() {
+        return polygon;
+    }
 
     public boolean isActive() {
         return active;
