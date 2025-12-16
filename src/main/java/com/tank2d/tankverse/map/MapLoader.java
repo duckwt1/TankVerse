@@ -341,10 +341,10 @@ public class MapLoader {
 
         return false;
     }
-    public boolean checkPlayerBulletCollision(Player player) {
+    public Bullet checkPlayerBulletCollision(Entity player) {
 
         Polygon playerPoly = player.solidArea;
-        if (playerPoly == null) return false;
+        if (playerPoly == null) return null;
 
         for (Bullet b : bullets) {
             if (!b.isActive()) continue;
@@ -357,10 +357,10 @@ public class MapLoader {
 
             if (!a.isEmpty()) {
                 b.setActive(false);   // bullet biến mất
-                return true;          // player trúng đạn
+                return b;          // player trúng đạn
             }
         }
-        return false;
+        return null;
     }
 
 

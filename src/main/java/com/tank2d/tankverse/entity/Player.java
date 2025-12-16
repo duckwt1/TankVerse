@@ -1,6 +1,7 @@
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 package com.tank2d.tankverse.entity;
 
+import com.tank2d.tankverse.core.PlayPanel;
 import com.tank2d.tankverse.map.MapLoader;
 import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.utils.Constant;
@@ -39,7 +40,9 @@ public class Player extends Entity {
 
     // Tốc độ di chuyển và tốc độ xoay
     private final double rotateSpeed = 2.5; // độ/khung hình
+    public int maxHp;
     public int hp;
+    public int lastHp;
     public int mp;
     public int dmg;
     public int defense;
@@ -56,7 +59,9 @@ public class Player extends Entity {
         this.playerName = playerName;
         this.mapLoader = mapLoader;
         getImages();
-        hp = 100;
+        maxHp = 100;
+        hp = maxHp;
+        lastHp = hp;
         bullet = 100;
         dmg = 5;
 
@@ -146,12 +151,27 @@ public class Player extends Entity {
     }
 
     @Override
-    public void update() {
+    public void update(PlayPanel panel) {
         if (action == Constant.ACTION_SHOOT)
         {
             shootBullet();
             action = Constant.ACTION_CHARGE;
         }
+        Bullet collide = mapLoader.checkPlayerBulletCollision(this);
+        if (collide != null) {
+            int damage = panel.getOther(collide.ownerName).dmg;
+
+            hp -= damage;
+            if (hp < 0) hp = 0;
+        }
+        // ===== HP SMOOTH UPDATE =====
+        if (lastHp > hp) {
+            lastHp -= hp / 100; // tốc độ tụt (tăng số này nếu muốn tụt nhanh hơn)
+            if (lastHp < hp) {
+                lastHp = hp;
+            }
+        }
+
         initSolidArea();
 
         double dx = 0, dy = 0;
@@ -197,7 +217,7 @@ public class Player extends Entity {
             //System.out.println("collide");
             return;
         }
-        if (mapLoader.checkPlayerBulletCollision(this))
+        if (mapLoader.checkPlayerBulletCollision(this) != null)
         {
             System.out.println("get hit");
         }
@@ -210,6 +230,9 @@ public class Player extends Entity {
         } else {
             startBounce(dx, dy);
         }
+
+
+
     }
 
 
@@ -265,9 +288,9 @@ public class Player extends Entity {
     public void draw(GraphicsContext gc) {
         if (bodyImage == null || gunImage == null) return;
 
+
         double centerX = Constant.SCREEN_WIDTH / 2.0;
         double centerY = Constant.SCREEN_HEIGHT / 2.0;
-
         double bodyW = bodyImage.getWidth();
         double bodyH = bodyImage.getHeight();
 
@@ -286,13 +309,44 @@ public class Player extends Entity {
         gc.setTransform(transform);
         gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
         gc.restore();
-
+        drawHp(gc);
         // --- Debug ---
         gc.setFill(Color.WHITE);
         gc.fillText(playerName, centerX - 20, centerY - bodyH / 2 - 5);
         gc.setFill(Color.RED);
         gc.fillText(String.format("x: %.1f, y: %.1f  angle: %.1f°", x, y, bodyAngle), 10, 20);
     }
+    private void drawHp(GraphicsContext gc)
+    {
+        double centerX = Constant.SCREEN_WIDTH / 2.0;
+        double centerY = Constant.SCREEN_HEIGHT / 2.0;
+        double bodyW = bodyImage.getWidth();
+        double bodyH = bodyImage.getHeight();
+        // ===== DRAW HP BAR =====
+        double barWidth = 50;
+        double barHeight = 6;
+
+        double hpPercent = (double) hp / maxHp;
+        double lastHpPercent = (double) lastHp / maxHp;
+
+        double barX = centerX - barWidth / 2;
+        double barY = centerY - bodyH / 2 - 15;
+
+        gc.setFill(Color.DARKGRAY);
+        gc.fillRect(barX, barY, barWidth, barHeight);
+
+        gc.setFill(Color.RED);
+        gc.fillRect(barX, barY, barWidth * lastHpPercent, barHeight);
+
+        gc.setFill(Color.LIMEGREEN);
+        gc.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
+        gc.strokeRect(barX, barY, barWidth, barHeight);
+
+    }
+
 
     /** Giúp giữ góc trong khoảng [-180, 180] */
     private double normalizeAngle(double angle) {

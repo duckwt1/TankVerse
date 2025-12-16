@@ -1,5 +1,6 @@
 package com.tank2d.tankverse.entity;
 
+import com.tank2d.tankverse.core.PlayPanel;
 import com.tank2d.tankverse.map.MapLoader;
 import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.utils.Constant;
@@ -38,7 +39,9 @@ public class OtherPlayer extends Entity{
 
     private double bounceVX = 0;
     private double bounceVY = 0;
+    public int maxHp;
     public int hp;
+    public int lastHp;
     public int mp;
     public int dmg;
     public int defense;
@@ -61,7 +64,9 @@ public class OtherPlayer extends Entity{
         this.mapLoader = mapLoader;
         this.player = player;
         getImages();
-        hp = 100;
+        maxHp = 100;
+        hp = maxHp;
+        lastHp = hp;
         bullet = 4;
         dmg = 5;
 
@@ -84,12 +89,26 @@ public class OtherPlayer extends Entity{
     }
 
     @Override
-    public void update() {
+    public void update(PlayPanel panel) {
         if (this.action == Constant.ACTION_CHARGE || this.action == Constant.ACTION_SHOOT)
         {
             //System.out.println("avasvcs");
             shootBullet();
             this.action = Constant.ACTION_NONE;
+        }
+        Bullet collide = mapLoader.checkPlayerBulletCollision(this);
+        if (collide != null) {
+            int damage = panel.getOther(collide.ownerName).dmg;
+
+            hp -= damage;
+            if (hp < 0) hp = 0;
+        }
+        // ===== HP SMOOTH UPDATE =====
+        if (lastHp > hp) {
+            lastHp -= hp / 100; // tốc độ tụt (tăng số này nếu muốn tụt nhanh hơn)
+            if (lastHp < hp) {
+                lastHp = hp;
+            }
         }
         initSolidArea();
 
@@ -232,11 +251,44 @@ public class OtherPlayer extends Entity{
         gc.setTransform(transform);
         gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
         gc.restore();
-
+        drawHp(gc, screenX, screenY, bodyH);
         // --- Draw player name & debug info ---
         gc.setFill(Color.WHITE);
         gc.fillText(playerName, screenX - 20, screenY - bodyH / 2 - 5);
     }
+    private void drawHp(GraphicsContext gc,
+                           double screenX,
+                           double screenY,
+                           double bodyH) {
+
+        double barWidth = 40;
+        double barHeight = 5;
+
+        double hpPercent = (double) hp / maxHp;
+        double lastHpPercent = (double) lastHp / maxHp;
+
+        // Vị trí HP bar (trên đầu tank)
+        double barX = screenX - barWidth / 2;
+        double barY = screenY - bodyH / 2 - 12;
+
+        // nền
+        gc.setFill(Color.rgb(50, 50, 50, 0.8));
+        gc.fillRect(barX, barY, barWidth, barHeight);
+
+        // lastHp (tụt chậm – đỏ)
+        gc.setFill(Color.RED);
+        gc.fillRect(barX, barY, barWidth * lastHpPercent, barHeight);
+
+        // hp thật (xanh)
+        gc.setFill(Color.LIMEGREEN);
+        gc.fillRect(barX, barY, barWidth * hpPercent, barHeight);
+
+        // viền
+        gc.setStroke(Color.BLACK);
+        gc.setLineWidth(1);
+        gc.strokeRect(barX, barY, barWidth, barHeight);
+    }
+
 
 
     /** Giúp giữ góc trong khoảng [-180, 180] */

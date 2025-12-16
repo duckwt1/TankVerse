@@ -12,7 +12,7 @@ public class Bullet extends GameObject {
 
     private double angle;
     private double speed = 12;
-    private String ownerName;
+    public String ownerName;
     private boolean active = true;
     private Polygon polygon;
     public Bullet(double x, double y, double angle, String ownerName, int bulletId) {

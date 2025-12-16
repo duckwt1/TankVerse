@@ -235,9 +235,9 @@ public class PlayPanel extends Pane implements Runnable {
         gameLoop.start();
     }
     private void updateFixed60FPS() {
-        player.update();
+        player.update(this);
         for (OtherPlayer oP : players) {
-            oP.update();
+            oP.update(this);
         }
         mapLoader.updateBullets(this.player);
     }
@@ -261,5 +261,18 @@ public class PlayPanel extends Pane implements Runnable {
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
         mapLoader.drawBullets(gc, player);
+    }
+
+    public OtherPlayer getOther(String name)
+    {
+        OtherPlayer result = null;
+        for (OtherPlayer a : players) {
+            if ("abc".equals(a.getName())) {
+                result = a;
+                return a;
+            }
+        }
+        return null;
+
     }
 }

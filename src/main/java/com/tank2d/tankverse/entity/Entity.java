@@ -1,5 +1,6 @@
 package com.tank2d.tankverse.entity;
 
+import com.tank2d.tankverse.core.PlayPanel;
 import com.tank2d.tankverse.map.MapLoader;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -25,6 +26,9 @@ public abstract class Entity {
     public void initSolidArea(){};
     public void getImages() {}
     public void update() {}
+
+
+    public abstract void update(PlayPanel panel);
 
     public void draw(GraphicsContext gc) {
 
