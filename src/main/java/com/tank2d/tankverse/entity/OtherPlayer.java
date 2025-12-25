@@ -24,10 +24,10 @@ public class OtherPlayer extends Entity{
     private double gunAngle = 0;
     public boolean backward; // trạng thái phím lùi
     private MapLoader mapLoader;
-    public int solidAreaX = 8;
+    public int solidAreaX = 12;
     public int solidAreaY = 16;
-    public int solidWidth = (int) (Constant.TILESIZE * Constant.CHAR_SCALE - solidAreaX * 2);
-    public int solidHeight = (int) (Constant.TILESIZE * Constant.CHAR_SCALE - solidAreaY);
+    public int solidWidth = (int) (Constant.PLAYER_TILE_SIZE * Constant.CHAR_SCALE - solidAreaX * 2 );
+    public int solidHeight = (int) (Constant.PLAYER_TILE_SIZE * Constant.CHAR_SCALE - solidAreaY * 2);
     // Trạng thái phím
     public boolean up;
     public boolean down;
@@ -87,6 +87,26 @@ public class OtherPlayer extends Entity{
             e.printStackTrace();
         }
     }
+    @Override
+    public void initSolidArea() {
+        solidArea = new Polygon();
+
+        double rad = Math.toRadians(bodyAngle);
+
+        double[][] corners = {
+                { solidAreaX - bodyImage.getWidth()/2,  solidAreaY - bodyImage.getHeight()/2 },
+                { solidAreaX + solidWidth - bodyImage.getWidth()/2,  solidAreaY - bodyImage.getHeight()/2 },
+                { solidAreaX + solidWidth - bodyImage.getWidth()/2,  solidAreaY + solidHeight - bodyImage.getHeight()/2 },
+                { solidAreaX - bodyImage.getWidth()/2,  solidAreaY + solidHeight - bodyImage.getHeight()/2 }
+        };
+
+        for (double[] c : corners) {
+            double rx = c[0] * Math.cos(rad) - c[1] * Math.sin(rad);
+            double ry = c[0] * Math.sin(rad) + c[1] * Math.cos(rad);
+
+            solidArea.addPoint((int)(x + rx), (int)(y + ry));
+        }
+    }
 
     @Override
     public void update(PlayPanel panel) {
@@ -96,6 +116,8 @@ public class OtherPlayer extends Entity{
             shootBullet();
             this.action = Constant.ACTION_NONE;
         }
+        initSolidArea();
+
         Bullet collide = mapLoader.checkPlayerBulletCollision(this);
         if (collide != null) {
             int damage = panel.getOther(collide.ownerName).dmg;
@@ -110,7 +132,6 @@ public class OtherPlayer extends Entity{
                 lastHp = hp;
             }
         }
-        initSolidArea();
 
         double dx = 0, dy = 0;
 
@@ -262,7 +283,7 @@ public class OtherPlayer extends Entity{
                            double bodyH) {
 
         double barWidth = 40;
-        double barHeight = 5;
+        double barHeight = 6;
 
         double hpPercent = (double) hp / maxHp;
         double lastHpPercent = (double) lastHp / maxHp;

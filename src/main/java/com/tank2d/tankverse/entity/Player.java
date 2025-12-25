@@ -323,7 +323,7 @@ public class Player extends Entity {
         double bodyW = bodyImage.getWidth();
         double bodyH = bodyImage.getHeight();
         // ===== DRAW HP BAR =====
-        double barWidth = 50;
+        double barWidth = 40;
         double barHeight = 6;
 
         double hpPercent = (double) hp / maxHp;

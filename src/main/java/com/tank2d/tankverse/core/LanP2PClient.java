@@ -122,16 +122,16 @@ public class LanP2PClient extends Thread {
                 InetAddress realIp = pkt.getAddress();
                 int realPort = pkt.getPort();
 
-                System.out.println("[P2P] RECV from " +
-                        realIp.getHostAddress() + ":" + realPort + " -> " + msg);
+                //System.out.println("[P2P] RECV from " +
+               //         realIp.getHostAddress() + ":" + realPort + " -> " + msg);
 
                 if (msg.startsWith("HELLO ")) {
                     String peerName = msg.substring(6).trim();
                     onHello(peerName, realIp, realPort);
                 }
                 else if (msg.startsWith("HELLO_ACK ")) {
-                    System.out.println("[P2P] HELLO_ACK from " +
-                            msg.substring(10).trim());
+                //    System.out.println("[P2P] HELLO_ACK from " +
+                //            msg.substring(10).trim());
                 }
                 else if (msg.startsWith("STATE ")) {
                     parseState(msg.substring(6));
@@ -146,8 +146,8 @@ public class LanP2PClient extends Thread {
 
     // ================= HELLO HANDLER =================
     private void onHello(String name, InetAddress ip, int port) {
-        System.out.println("[P2P] HELLO FROM " + name +
-                " @ " + ip.getHostAddress() + ":" + port);
+//        System.out.println("[P2P] HELLO FROM " + name +
+//                " @ " + ip.getHostAddress() + ":" + port);
 
         for (Map<String, Object> peer : peers) {
             if (peer.get("name").equals(name)) {
@@ -155,8 +155,8 @@ public class LanP2PClient extends Thread {
                 peer.put("ip", ip.getHostAddress());
                 peer.put("udpPort", port);
 
-                System.out.println("[P2P] UPDATED PEER " + name +
-                        " -> " + ip.getHostAddress() + ":" + port);
+//                System.out.println("[P2P] UPDATED PEER " + name +
+//                        " -> " + ip.getHostAddress() + ":" + port);
 
                 send("HELLO_ACK " + playPanel.getPlayer().getName(), ip, port);
                 return;

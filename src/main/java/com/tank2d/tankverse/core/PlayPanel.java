@@ -265,10 +265,10 @@ public class PlayPanel extends Pane implements Runnable {
 
     public OtherPlayer getOther(String name)
     {
-        OtherPlayer result = null;
+        //OtherPlayer result = null;
         for (OtherPlayer a : players) {
-            if ("abc".equals(a.getName())) {
-                result = a;
+            if (name.equals(a.getName())) {
+                //result = a;
                 return a;
             }
         }
