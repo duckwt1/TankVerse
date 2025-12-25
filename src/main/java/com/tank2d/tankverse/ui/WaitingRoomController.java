@@ -1,8 +1,6 @@
 package com.tank2d.tankverse.ui;
 
 import com.tank2d.tankverse.core.*;
-import com.tank2d.tankverse.net.P2PConnection;
-import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.Packet;
 import com.tank2d.tankverse.utils.PacketType;
 import javafx.application.Platform;
@@ -88,7 +86,7 @@ public class WaitingRoomController implements PacketListener {
             stage.show();
 
             // Khởi động P2P với danh sách peers từ server
-            LanP2PClient p2p = new LanP2PClient(playPanel, udpSocket, peers);
+            P2PClient p2p = new P2PClient(playPanel, udpSocket, peers);
             p2p.start();
 
 

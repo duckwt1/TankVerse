@@ -7,7 +7,7 @@ import java.net.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
-public class LanP2PClient extends Thread {
+public class P2PClient extends Thread {
 
     private final PlayPanel playPanel;
     private final List<Map<String, Object>> peers;
@@ -17,9 +17,9 @@ public class LanP2PClient extends Thread {
     // name -> last state
     private final Map<String, PlayerState> remotePlayers = new ConcurrentHashMap<>();
 
-    public LanP2PClient(PlayPanel panel,
-                        DatagramSocket socket,
-                        List<Map<String,Object>> peers) {
+    public P2PClient(PlayPanel panel,
+                     DatagramSocket socket,
+                     List<Map<String,Object>> peers) {
         this.socket = socket; // dùng socket đã bind từ WaitingRoom
         this.peers = peers;
         this.playPanel = panel;

@@ -27,7 +27,7 @@ public class Constant {
     //public static final int DEFAULT_SERVER_PORT = 11640;
 
 
-    public static final String LAN_SERVER_HOST = "192.168.1.10"; // ĐỔI THEO MÁY BẠN
+    public static final String LAN_SERVER_HOST = "26.0.26.202"; // ĐỔI THEO MÁY BẠN
     public static final int LAN_SERVER_PORT = 11640;
 
 
