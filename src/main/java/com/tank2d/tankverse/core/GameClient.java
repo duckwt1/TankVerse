@@ -126,9 +126,10 @@ public class GameClient {
                         List<Map<String, Object>> tanks = (List<Map<String, Object>>) p.data.get("tanks");
                         List<Map<String, Object>> items = (List<Map<String, Object>>) p.data.get("items");
                         int gold = toInt(p.data.getOrDefault("gold", 0));
+                        Map<String, Object> equippedTank = (Map<String, Object>) p.data.get("equippedTank");
                         listener.onInventoryReceived(tanks != null ? tanks : new ArrayList<>(),
                                 items != null ? items : new ArrayList<>(),
-                                gold);
+                                gold, equippedTank);
                     }
                     case TANK_SHOP_LIST_DATA -> {
                         List<Map<String, Object>> tanks = (List<Map<String, Object>>) p.data.get("tanks");
