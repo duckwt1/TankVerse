@@ -246,6 +246,8 @@ public class PlayPanel extends Pane implements Runnable {
             oP.update(this);
         }
         mapLoader.updateBullets(this.player);
+        mapLoader.updateTowers(player, this);
+
     }
 
 
@@ -267,6 +269,7 @@ public class PlayPanel extends Pane implements Runnable {
         //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
+        mapLoader.drawTowers(gc, player);
         mapLoader.drawBullets(gc, player);
     }
 

@@ -2,10 +2,12 @@ package com.tank2d.tankverse.map;
 
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 
+import com.tank2d.tankverse.core.PlayPanel;
 import com.tank2d.tankverse.effect.EffectManager;
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.Player;
 import com.tank2d.tankverse.object.Bullet;
+import com.tank2d.tankverse.object.Tower;
 import com.tank2d.tankverse.utils.Constant;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
@@ -37,10 +39,17 @@ public class MapLoader {
     public Polygon testCollisionP;
     private ArrayList<Bullet> bullets = new ArrayList<>();
     public EffectManager eManager = new EffectManager();
+    private ArrayList<Tower> towers = new ArrayList<>();
+
     public MapLoader(int id) {
         this.id = id;
         loadMap("/com/tank2d/tankverse/map/map" + id + ".tmj");
+
+        // ===== Spawn towers (world coords) =====
+        addTower(new Tower(500, 400, 1));
+        addTower(new Tower(900, 700, 1));
     }
+
 
     private void loadMap(String mapPath) {
         try {
@@ -274,6 +283,52 @@ public class MapLoader {
         }
         //drawBullets(gc);
     }
+
+    public void addTower(Tower t) {
+        towers.add(t);
+    }
+
+    public ArrayList<Tower> getTowers() {
+        return towers;
+    }
+
+    public void drawTowers(GraphicsContext gc, Player player) {
+        for (Tower t : towers) {
+            t.draw(gc, player);
+        }
+    }
+
+    public void updateTowers(Player player, PlayPanel panel) {
+        for (int i = 0; i < towers.size(); i++) {
+            Tower t = towers.get(i);
+            t.update(player, this);
+
+            if (!t.isAlive()) continue;
+
+            // Check tower vs bullets
+            Rectangle towerBox = t.getHitbox();
+            for (Bullet b : bullets) {
+                if (!b.isActive()) continue;
+                Polygon bp = b.getPolygon();
+                if (bp == null) continue;
+
+                Area a = new Area(towerBox);
+                a.intersect(new Area(bp));
+
+                if (!a.isEmpty()) {
+                    // trúng đạn
+                    int damage = panel.getDamage(b.ownerName); // giống player
+                    t.takeDamage(damage);
+
+                    b.setActive(false);
+                    eManager.spawnExplosion(b.getX(), b.getY(), 200);
+                    break; // 1 viên đạn chỉ ăn 1 lần
+                }
+            }
+        }
+    }
+
+
     public void drawBullets(GraphicsContext gc, Player player) {
         for (Bullet b : bullets) {
             b.draw(gc, player);
