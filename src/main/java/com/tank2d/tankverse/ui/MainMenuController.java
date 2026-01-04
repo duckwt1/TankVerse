@@ -50,12 +50,12 @@ public class MainMenuController implements PacketListener {
     }
 
     private void onInventory(){
-//        Platform.runLater(() -> {
-//            InventoryController controller = UiNavigator.loadSceneWithController("inventory.fxml");
-//            controller.setClient(client);
-//            // Request inventory data from server
-//            controller.requestInventory();
-//        });
+        Platform.runLater(() -> {
+            InventoryController controller = UiNavigator.loadSceneWithController("inventory.fxml");
+            controller.setClient(client);
+            // Request inventory data from server
+            controller.requestInventory();
+        });
     }
 
     private void onJoinRoom() {

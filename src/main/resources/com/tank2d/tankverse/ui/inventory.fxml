@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.effect.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.*?>
+<StackPane fx:id="rootPane"
+           prefHeight="700.0"
+           prefWidth="1000.0"
+           xmlns="http://javafx.com/javafx/17.0.2-ea"
+           xmlns:fx="http://javafx.com/fxml/1"
+           fx:controller="com.tank2d.tankverse.ui.InventoryController">
+
+    <AnchorPane prefHeight="700.0" prefWidth="1000.0">
+
+        <style>
+            -fx-background-color: radial-gradient(center 50% 50%, radius 80%, #a1c4a0 0%, #8ab48f 70%, #6b9080 100%);
+        </style>
+
+        <VBox alignment="TOP_CENTER" layoutX="125.0" layoutY="50.0" prefHeight="600.0" prefWidth="750.0" spacing="15"
+              style="-fx-background-color: #f4e8c1; -fx-border-color: #704214; -fx-border-width: 6; -fx-background-radius: 15; -fx-border-radius: 12; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.5), 20, 0, 0, 10);">
+
+            <padding>
+                <Insets bottom="25" left="35" right="35" top="25"/>
+            </padding>
+
+            <VBox alignment="CENTER" spacing="5">
+                <Label text="🎒" textFill="#5d4037">
+                    <font>
+                        <Font size="42.0"/>
+                    </font>
+                    <effect>
+                        <DropShadow color="#8B4513" radius="3"/>
+                    </effect>
+                </Label>
+                <Label fx:id="lblTitle" style="-fx-font-weight: bold;" text="TANK INVENTORY" textFill="#704214">
+                    <font>
+                        <Font name="System Bold" size="32.0"/>
+                    </font>
+                    <effect>
+                        <DropShadow color="rgba(244,232,193,0.8)" radius="2"/>
+                    </effect>
+                </Label>
+
+                <HBox alignment="CENTER" spacing="12"
+                      style="-fx-background-color: #eaddb2; -fx-background-radius: 20; -fx-padding: 5 20; -fx-border-color: #8a6f47; -fx-border-width: 1; -fx-border-radius: 20;">
+                    <Label style="-fx-font-weight: bold;" text="GOLD RESERVES:" textFill="#704214">
+                        <font>
+                            <Font name="System Bold" size="13.0"/>
+                        </font>
+                    </Label>
+                    <Label fx:id="lblGold" text="1,250 💰" textFill="#d4a017">
+                        <font>
+                            <Font name="System Bold" size="15.0"/>
+                        </font>
+                        <effect>
+                            <DropShadow color="#00000044" radius="2"/>
+                        </effect>
+                    </Label>
+                </HBox>
+            </VBox>
+
+            <HBox prefHeight="380.0" spacing="20" VBox.vgrow="ALWAYS">
+
+                <VBox prefWidth="320.0" spacing="12">
+                    <Label style="-fx-font-weight: bold;" text="🛡️ ACTIVE TANK" textFill="#704214">
+                        <font>
+                            <Font size="14.0"/>
+                        </font>
+                    </Label>
+
+                    <StackPane prefHeight="160.0"
+                               style="-fx-background-color: #ffffff; -fx-border-color: #8a6f47; -fx-border-width: 3; -fx-background-radius: 10; -fx-border-radius: 8;">
+                        <ImageView fx:id="imgEquippedTank" fitHeight="110.0" fitWidth="220.0" preserveRatio="true"/>
+                        <Label fx:id="lblEquippedTankName"
+                               style="-fx-background-color: #704214; -fx-text-fill: white; -fx-padding: 3 10; -fx-background-radius: 5 0 8 0; -fx-font-weight: bold;"
+                               text="T-34 SOVIET" StackPane.alignment="TOP_LEFT">
+                            <font>
+                                <Font size="12.0"/>
+                            </font>
+                        </Label>
+                    </StackPane>
+
+                    <VBox spacing="10"
+                          style="-fx-background-color: #eaddb2; -fx-padding: 12; -fx-background-radius: 8; -fx-border-color: #8a6f47; -fx-border-width: 2;">
+                        <Label style="-fx-font-weight: bold;" text="TECHNICAL DATA" textFill="#5d4037">
+                            <font>
+                                <Font size="12.0"/>
+                            </font>
+                        </Label>
+                        <GridPane hgap="8" vgap="8">
+                            <Label text="❤️ HP:" textFill="#704214" GridPane.columnIndex="0" GridPane.rowIndex="0">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                            </Label>
+                            <ProgressBar fx:id="pbHealth" prefWidth="150" progress="0.8" style="-fx-accent: #c54245;"
+                                         GridPane.columnIndex="1" GridPane.rowIndex="0"/>
+
+                            <Label text="⚔️ ATK:" textFill="#704214" GridPane.columnIndex="0" GridPane.rowIndex="1">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                            </Label>
+                            <ProgressBar fx:id="pbDamage" prefWidth="150" progress="0.6" style="-fx-accent: #7a9c8e;"
+                                         GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+
+                            <Label text="💨 SPD:" textFill="#704214" GridPane.columnIndex="0" GridPane.rowIndex="2">
+                                <font>
+                                    <Font size="11.0"/>
+                                </font>
+                            </Label>
+                            <ProgressBar fx:id="pbSpeed" prefWidth="150" progress="0.4" style="-fx-accent: #d4a574;"
+                                         GridPane.columnIndex="1" GridPane.rowIndex="2"/>
+                            <columnConstraints>
+                                <ColumnConstraints maxWidth="50.0" minWidth="40.0" prefWidth="45.0"/>
+                                <ColumnConstraints hgrow="ALWAYS"/>
+                            </columnConstraints>
+                        </GridPane>
+                    </VBox>
+                </VBox>
+
+                <VBox prefWidth="360.0" spacing="8" HBox.hgrow="ALWAYS">
+                    <HBox alignment="BOTTOM_LEFT" spacing="10">
+                        <Label style="-fx-font-weight: bold;" text="📦 STORAGE SLOTS" textFill="#704214">
+                            <font>
+                                <Font size="14.0"/>
+                            </font>
+                        </Label>
+                        <Region HBox.hgrow="ALWAYS"/>
+                        <Label text="12/20" textFill="#8a6f47">
+                            <font>
+                                <Font name="System Bold Italic" size="12.0"/>
+                            </font>
+                        </Label>
+                    </HBox>
+
+                    <ScrollPane fitToWidth="true" prefHeight="320.0" VBox.vgrow="ALWAYS"
+                                style="-fx-background-color: transparent; -fx-background: #eaddb2; -fx-border-color: #8a6f47; -fx-border-width: 3; -fx-border-radius: 8; -fx-background-radius: 8;">
+                        <GridPane fx:id="gridInventory" hgap="10" style="-fx-padding: 10;" vgap="10">
+                        </GridPane>
+                    </ScrollPane>
+                </VBox>
+            </HBox>
+
+            <HBox alignment="CENTER" spacing="25">
+                <VBox.margin>
+                    <Insets top="5"/>
+                </VBox.margin>
+                <Button fx:id="btnBack" onAction="#onBack" prefHeight="48.0" prefWidth="160.0"
+                        style="-fx-background-color: linear-gradient(to bottom, #d9b382, #d4a574); -fx-border-color: #a67c52; -fx-border-width: 3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"
+                        text="BACK">
+                    <font>
+                        <Font size="14.0"/>
+                    </font>
+                </Button>
+
+                <Button fx:id="btnUseItem" prefHeight="48.0" prefWidth="220.0"
+                        style="-fx-background-color: linear-gradient(to bottom, #7a9c8e, #6b9080); -fx-border-color: #4a6859; -fx-border-width: 3; -fx-text-fill: white; -fx-font-weight: bold; -fx-background-radius: 10; -fx-cursor: hand;"
+                        text="EQUIP ITEM">
+                    <font>
+                        <Font size="15.0"/>
+                    </font>
+                    <effect>
+                        <DropShadow color="rgba(0,0,0,0.3)" radius="5"/>
+                    </effect>
+                </Button>
+            </HBox>
+        </VBox>
+
+        <Label layoutX="30.0" layoutY="30.0" style="-fx-font-size: 34;" text="⚔️" textFill="#5d4037">
+            <effect>
+                <DropShadow color="#8B4513" radius="3"/>
+            </effect>
+        </Label>
+        <Label layoutX="925.0" layoutY="30.0" style="-fx-font-size: 34;" text="🛡️" textFill="#d4a017">
+            <effect>
+                <DropShadow color="#8B4513" radius="3"/>
+            </effect>
+        </Label>
+        <Label layoutX="30.0" layoutY="635.0" style="-fx-font-size: 32;" text="🎯" textFill="#c54245"/>
+        <Label layoutX="925.0" layoutY="635.0" style="-fx-font-size: 32;" text="💥" textFill="#d4a574"/>
+
+    </AnchorPane>
+
+</StackPane>

@@ -33,7 +33,7 @@ public interface PacketListener {
     default void onBuyFail(String message) {}
     
     // Inventory events
-    default void onInventoryReceived(List<Map<String, Object>> tanks, List<Map<String, Object>> items, int gold) {}
+    default void onInventoryReceived(List<Map<String, Object>> tanks, List<Map<String, Object>> items, int gold, Map<String, Object> equippedTank) {}
     default void onTankShopDataReceived(List<Map<String, Object>> tanks, int gold) {}
     default void onEquipTankSuccess(int tankId) {}
     default void onEquipTankFail(String msg) {}
