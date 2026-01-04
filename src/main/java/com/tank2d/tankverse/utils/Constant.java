@@ -29,7 +29,9 @@ public class Constant {
 
     public static final String LAN_SERVER_HOST = "26.0.26.202"; // ĐỔI THEO MÁY BẠN
     public static final int LAN_SERVER_PORT = 11640;
-
+//    public static final int PLAYER_PLAYING = 1;
+//    public static final int PLAYER_DIE = 2;
+//    public static final int GAME_FINISH = 3;
 
     public static final String DEFAULT_RELAY_HOST = "try-crystal.gl.at.ply.gg";
     public static final int DEFAULT_RELAY_PORT = 65455;

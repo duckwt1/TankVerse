@@ -17,7 +17,7 @@ public class OtherPlayer extends Entity{
     private final String playerName;
     private Image bodyImage;
     private Image gunImage;
-
+    private Image dieImage;
     // Góc thân (hiện tại) và góc mục tiêu (khi nhấn phím)
     private double bodyAngle = 0;
     private double targetAngle = 0;
@@ -77,7 +77,7 @@ public class OtherPlayer extends Entity{
         try {
             bodyImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/tank2.png"));
             gunImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/gun/gun1.png"));
-
+            dieImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/die.png"));
             gunPivotX = gunImage.getWidth() / 4;
             gunPivotY = gunImage.getHeight() / 2;
 
@@ -110,6 +110,10 @@ public class OtherPlayer extends Entity{
 
     @Override
     public void update(PlayPanel panel) {
+        if (this.isAlive == false)
+        {
+            return;
+        }
         if (this.action == Constant.ACTION_CHARGE || this.action == Constant.ACTION_SHOOT)
         {
             //System.out.println("avasvcs");
@@ -120,10 +124,19 @@ public class OtherPlayer extends Entity{
 
         Bullet collide = mapLoader.checkPlayerBulletCollision(this);
         if (collide != null) {
-            int damage = panel.getOther(collide.ownerName).dmg;
+            int damage = panel.getDamage(collide.ownerName);
 
             hp -= damage;
-            if (hp < 0) hp = 0;
+            System.out.println("o player " + hp);
+            if (hp < 0){
+                hp = 0;
+                this.isAlive = false;
+                if (collide.ownerName.equals(player.getName()))
+                {
+                    player.kill ++;
+                }
+            }
+
         }
         // ===== HP SMOOTH UPDATE =====
         if (lastHp > hp) {
@@ -234,49 +247,60 @@ public class OtherPlayer extends Entity{
     public void draw(GraphicsContext gc) {
         if (bodyImage == null || gunImage == null || player == null) return;
 
-        // --- Define visible range around main player (the "camera view") ---
-
         double halfW = Constant.SCREEN_WIDTH / 2.0;
         double halfH = Constant.SCREEN_HEIGHT / 2.0;
 
-        // Player’s camera center
         double camX = player.getX();
         double camY = player.getY();
 
-        // Skip drawing if outside camera range (with small buffer)
-        double buffer = 100; // draw slightly beyond screen edge to prevent pop-in
+        double buffer = 100;
         if (x < camX - halfW - buffer || x > camX + halfW + buffer ||
                 y < camY - halfH - buffer || y > camY + halfH + buffer) {
-            return; // Not visible → skip draw
+            return;
         }
 
-        // --- Compute screen position relative to camera ---
         double screenX = halfW + (x - camX);
         double screenY = halfH + (y - camY);
 
         double bodyW = bodyImage.getWidth();
         double bodyH = bodyImage.getHeight();
 
-        // --- Draw tank body ---
+        // ===== Draw body (with rotation) =====
         gc.save();
-        gc.translate(screenX, screenY);
-        gc.rotate(bodyAngle);
-        gc.drawImage(bodyImage, -bodyW / 2, -bodyH / 2);
-        gc.restore();
+        try {
+            gc.translate(screenX, screenY);
+            gc.rotate(bodyAngle);
 
-        // --- Draw gun ---
-        gc.save();
-        Affine transform = new Affine();
-        transform.appendTranslation(screenX, screenY);
-        transform.appendRotation(Math.toDegrees(gunAngle));
-        gc.setTransform(transform);
-        gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
-        gc.restore();
-        drawHp(gc, screenX, screenY, bodyH);
-        // --- Draw player name & debug info ---
+            if (this.isAlive) {
+                gc.drawImage(bodyImage, -bodyW / 2, -bodyH / 2);
+            } else {
+                gc.drawImage(dieImage, -bodyW / 2, -bodyH / 2);
+            }
+        } finally {
+            gc.restore();
+        }
+
+        // ===== Draw gun (only if alive) =====
+        if (this.isAlive) {
+            gc.save();
+            try {
+                Affine transform = new Affine();
+                transform.appendTranslation(screenX, screenY);
+                transform.appendRotation(Math.toDegrees(gunAngle));
+                gc.setTransform(transform);
+                gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
+            } finally {
+                gc.restore();
+            }
+
+            drawHp(gc, screenX, screenY, bodyH);
+        }
+
+        // ===== Draw name (NO transform active) =====
         gc.setFill(Color.WHITE);
         gc.fillText(playerName, screenX - 20, screenY - bodyH / 2 - 5);
     }
+
     private void drawHp(GraphicsContext gc,
                            double screenX,
                            double screenY,

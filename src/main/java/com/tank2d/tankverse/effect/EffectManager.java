@@ -9,12 +9,12 @@ public class EffectManager {
 
     private final List<Effect> effects = new ArrayList<>();
 
-    public void addEffect(Effect effect) {
+    public void add(Effect effect) {
         effects.add(effect);
     }
 
-    public void spawnExplosion(double x, double y) {
-        effects.add(new ExplosionEffect(x, y));
+    public void spawnExplosion(double x, double y, double radius) {
+        effects.add(new ExplosionEffect(x, y, radius));
     }
 
     public void update(double dt) {

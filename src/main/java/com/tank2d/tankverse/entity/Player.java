@@ -17,7 +17,7 @@ public class Player extends Entity {
     private final String playerName;
     private Image bodyImage;
     private Image gunImage;
-
+    private Image dieImage;
     // Góc thân (hiện tại) và góc mục tiêu (khi nhấn phím)
     private double bodyAngle = 0;
     private double targetAngle = 0;
@@ -31,12 +31,9 @@ public class Player extends Entity {
     // Trạng thái phím
     private boolean up, down, left, right;
 
-    private boolean isBouncing = false;
-    private long bounceEndTime = 0;
-
-    private double bounceVX = 0;
-    private double bounceVY = 0;
-
+    public int kill = 0;
+    public int die = 0;
+    //public int support = 0;
 
     // Tốc độ di chuyển và tốc độ xoay
     private final double rotateSpeed = 2.5; // độ/khung hình
@@ -52,6 +49,15 @@ public class Player extends Entity {
     // Pivot của nòng
     private double gunPivotX;
     private double gunPivotY;
+    // ===== RESPAWN SYSTEM =====
+    private boolean isRespawning = false;
+    private long respawnEndTime = 0;          // thời điểm kết thúc countdown
+    private final int RESPAWN_SECONDS = 10;   // 10s
+
+    // spawn position (có thể set từ ngoài)
+    private double spawnX;
+    private double spawnY;
+
 
     public Player(double x, double y, Polygon solidArea, double speed, MapLoader mapLoader, String playerName) {
         super(x, y, solidArea, speed, mapLoader);
@@ -64,6 +70,8 @@ public class Player extends Entity {
         lastHp = hp;
         bullet = 100;
         dmg = 5;
+        this.spawnX = x;
+        this.spawnY = y;
 
     }
     public boolean willCollide(double testX, double testY, double bodyAngle) {
@@ -139,6 +147,7 @@ public class Player extends Entity {
         try {
             bodyImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/tank2.png"));
             gunImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/gun/gun1.png"));
+            dieImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/die.png"));
 
             gunPivotX = gunImage.getWidth() / 4; // vị trí xoay nòng
             gunPivotY = gunImage.getHeight() / 2;
@@ -152,6 +161,11 @@ public class Player extends Entity {
 
     @Override
     public void update(PlayPanel panel) {
+        if (!this.isAlive) {
+            updateRespawnCountdown();
+            return;
+        }
+
         if (action == Constant.ACTION_SHOOT)
         {
             shootBullet();
@@ -159,10 +173,17 @@ public class Player extends Entity {
         }
         Bullet collide = mapLoader.checkPlayerBulletCollision(this);
         if (collide != null) {
-            int damage = panel.getOther(collide.ownerName).dmg;
+            int damage = (panel.getDamage(collide.ownerName));
 
             hp -= damage;
-            if (hp < 0) hp = 0;
+            if (hp <= 0 && this.isAlive) {
+                hp = 0;
+                this.isAlive = false;
+                this.die++;
+
+                startRespawnCountdown(); // <<< thêm dòng này
+            }
+
         }
         // ===== HP SMOOTH UPDATE =====
         if (lastHp > hp) {
@@ -258,12 +279,50 @@ public class Player extends Entity {
         return p;
     }
 
+    private void startRespawnCountdown() {
+        isRespawning = true;
+        respawnEndTime = System.currentTimeMillis() + RESPAWN_SECONDS * 1000L;
+
+        // (tuỳ chọn) reset input để khỏi tiếp tục di chuyển khi sống lại
+        up = down = left = right = backward = false;
+    }
+
+    private void updateRespawnCountdown() {
+        if (!isRespawning) return;
+
+        long now = System.currentTimeMillis();
+        if (now >= respawnEndTime) {
+            respawn();
+        }
+    }
+
+    private void respawn() {
+        // reset stats
+        this.isAlive = true;
+        this.isRespawning = false;
+
+        this.hp = this.maxHp;
+        this.lastHp = this.hp;
+        this.bullet = 100;
+
+        // reset position to spawn
+        this.x = spawnX;
+        this.y = spawnY;
+
+        // reset angles (tuỳ bạn)
+        // this.bodyAngle = 0;
+        // this.gunAngle = 0;
+
+        // reset input
+        up = down = left = right = backward = false;
+
+        // rebuild collision poly
+        initSolidArea();
+    }
 
 
     private void startBounce(double dx, double dy) {
 
-        isBouncing = true;
-        bounceEndTime = System.currentTimeMillis() + 500; // 0.5s
 
         // Vector bật ngược lại
         double backX = -dx;
@@ -278,8 +337,7 @@ public class Player extends Entity {
         // Tốc độ bật lại ban đầu (cảm giác mạnh)
         double initialBounceSpeed = 12;
 
-        bounceVX = backX * initialBounceSpeed;
-        bounceVY = backY * initialBounceSpeed;
+
     }
 
 
@@ -287,34 +345,44 @@ public class Player extends Entity {
     @Override
     public void draw(GraphicsContext gc) {
         if (bodyImage == null || gunImage == null) return;
-
-
         double centerX = Constant.SCREEN_WIDTH / 2.0;
         double centerY = Constant.SCREEN_HEIGHT / 2.0;
         double bodyW = bodyImage.getWidth();
         double bodyH = bodyImage.getHeight();
 
-        // --- Vẽ thân (xoay mượt theo hướng di chuyển) ---
-        gc.save();
-        gc.translate(centerX, centerY);
-        gc.rotate(bodyAngle);
-        gc.drawImage(bodyImage, -bodyW / 2, -bodyH / 2);
-        gc.restore();
+        if (this.isAlive) {
 
-        // --- Vẽ nòng ---
-        gc.save();
-        Affine transform = new Affine();
-        transform.appendTranslation(centerX, centerY);
-        transform.appendRotation(Math.toDegrees(gunAngle));
-        gc.setTransform(transform);
-        gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
-        gc.restore();
-        drawHp(gc);
+
+            // --- Vẽ thân (xoay mượt theo hướng di chuyển) ---
+            gc.save();
+            gc.translate(centerX, centerY);
+            gc.rotate(bodyAngle);
+            gc.drawImage(bodyImage, -bodyW / 2, -bodyH / 2);
+            gc.restore();
+
+            // --- Vẽ nòng ---
+            gc.save();
+            Affine transform = new Affine();
+            transform.appendTranslation(centerX, centerY);
+            transform.appendRotation(Math.toDegrees(gunAngle));
+            gc.setTransform(transform);
+            gc.drawImage(gunImage, -gunPivotX, -gunPivotY);
+            gc.restore();
+            drawHp(gc);
+        } else {
+            // vẽ xác chết nằm giữa
+            gc.drawImage(dieImage, centerX - bodyW / 2, centerY - bodyH / 2);
+
+            // vẽ overlay hồi sinh
+            drawRespawnOverlay(gc);
+        }
+
         // --- Debug ---
         gc.setFill(Color.WHITE);
         gc.fillText(playerName, centerX - 20, centerY - bodyH / 2 - 5);
         gc.setFill(Color.RED);
         gc.fillText(String.format("x: %.1f, y: %.1f  angle: %.1f°", x, y, bodyAngle), 10, 20);
+        drawKDA(gc);
     }
     private void drawHp(GraphicsContext gc)
     {
@@ -346,6 +414,39 @@ public class Player extends Entity {
         gc.strokeRect(barX, barY, barWidth, barHeight);
 
     }
+    private void drawRespawnOverlay(GraphicsContext gc) {
+        if (!isRespawning) return;
+
+        long now = System.currentTimeMillis();
+        long remainMs = Math.max(0, respawnEndTime - now);
+        int remainSec = (int) Math.ceil(remainMs / 1000.0);
+
+        // nền mờ toàn màn
+        gc.save();
+        gc.setFill(Color.rgb(0, 0, 0, 0.60));
+        gc.fillRect(0, 0, Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
+
+        // text giữa màn
+        String line1 = "YOU DIED";
+        String line2 = "Respawn in " + remainSec + "s";
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 48));
+        javafx.scene.text.Text t1 = new javafx.scene.text.Text(line1);
+        t1.setFont(gc.getFont());
+        double w1 = t1.getLayoutBounds().getWidth();
+
+        gc.fillText(line1, (Constant.SCREEN_WIDTH - w1) / 2.0, Constant.SCREEN_HEIGHT / 2.0 - 20);
+
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 24));
+        javafx.scene.text.Text t2 = new javafx.scene.text.Text(line2);
+        t2.setFont(gc.getFont());
+        double w2 = t2.getLayoutBounds().getWidth();
+
+        gc.fillText(line2, (Constant.SCREEN_WIDTH - w2) / 2.0, Constant.SCREEN_HEIGHT / 2.0 + 25);
+
+        gc.restore();
+    }
 
 
     /** Giúp giữ góc trong khoảng [-180, 180] */
@@ -364,6 +465,45 @@ public class Player extends Entity {
         double dy = e.getY() - centerY;
         gunAngle = Math.atan2(dy, dx);
     }
+    private void drawKDA(GraphicsContext gc) {
+        // Text like: "11 | 0 | 2"
+        String kdaText = kill + " | " + die  ;
+
+        // Corner top-right padding
+        double padding = 12;
+        double x = Constant.SCREEN_WIDTH - padding;
+        double y = 24; // a bit below the top edge
+
+        gc.save();
+
+        // Optional: background box for readability
+        double fontSize = 18;
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, fontSize));
+
+        // Measure text width (JavaFX way)
+        javafx.scene.text.Text temp = new javafx.scene.text.Text(kdaText);
+        temp.setFont(gc.getFont());
+        double textW = temp.getLayoutBounds().getWidth();
+        double textH = temp.getLayoutBounds().getHeight();
+
+        double boxPadX = 10;
+        double boxPadY = 6;
+
+        double boxX = (Constant.SCREEN_WIDTH - padding) - textW - boxPadX * 2;
+        double boxY = y - textH + 4 - boxPadY; // adjust baseline a little
+        double boxW = textW + boxPadX * 2;
+        double boxH = textH + boxPadY * 2;
+
+        gc.setFill(Color.rgb(0, 0, 0, 0.55));
+        gc.fillRoundRect(boxX, boxY, boxW, boxH, 10, 10);
+
+        // Draw text aligned to top-right
+        gc.setFill(Color.WHITE);
+        gc.fillText(kdaText, x - textW, y);
+
+        gc.restore();
+    }
+
 
 
     // ---- Phím điều khiển ----

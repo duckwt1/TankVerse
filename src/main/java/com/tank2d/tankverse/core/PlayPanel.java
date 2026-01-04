@@ -31,7 +31,6 @@ public class PlayPanel extends Pane implements Runnable {
     private Player player;
     private AnimationTimer gameLoop;
     private MapLoader mapLoader;
-
     private boolean isHost = false;
 
 
@@ -91,7 +90,11 @@ public class PlayPanel extends Pane implements Runnable {
             found.setRight(playerState.right);
             found.setLeft(playerState.left);
             found.setBackward(playerState.backward);
-            found.hp = playerState.hp;
+            if (found.isAlive == false && playerState.hp > 30)
+            {
+                found.hp = playerState.hp;
+                found.isAlive = true;
+            }
             found.bullet = playerState.bullet;
             found.action = playerState.action;
         }
@@ -235,7 +238,10 @@ public class PlayPanel extends Pane implements Runnable {
         gameLoop.start();
     }
     private void updateFixed60FPS() {
+
         player.update(this);
+
+        mapLoader.eManager.update(0.016);
         for (OtherPlayer oP : players) {
             oP.update(this);
         }
@@ -257,22 +263,26 @@ public class PlayPanel extends Pane implements Runnable {
         mapLoader.draw(gc, this.player);
         mapLoader.drawCollision(gc, this.player);
         player.draw(gc);
+        mapLoader.eManager.draw(gc, player.x, player.y);
         //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
         mapLoader.drawBullets(gc, player);
     }
 
-    public OtherPlayer getOther(String name)
+    public int getDamage(String name)
     {
         //OtherPlayer result = null;
+        System.out.println("search name: " + name);
         for (OtherPlayer a : players) {
+            System.out.println("search tartget: " + a.getName());
+
             if (name.equals(a.getName())) {
                 //result = a;
-                return a;
+                return a.dmg;
             }
         }
-        return null;
+        return this.player.dmg;
 
     }
 }

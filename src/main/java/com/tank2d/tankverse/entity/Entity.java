@@ -16,6 +16,8 @@ public abstract class Entity {
     public int spriteNum = 0;
     public MapLoader mapLoader;
     public int action = 0;
+    public boolean isAlive = true;
+
     public Entity(double x, double y, Polygon solidArea, double speed, MapLoader mapLoader) {
         this.x = x;
         this.y = y;

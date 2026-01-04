@@ -9,25 +9,27 @@ import java.util.List;
 
 public class ExplosionEffect extends Effect {
 
-    private final List<Fragment> fragments = new ArrayList<>();
-
-    // center (world)
     private final double x;
     private final double y;
+    private final double radius;
 
-    public ExplosionEffect(double x, double y) {
+    private final List<Fragment> fragments = new ArrayList<>();
+
+    public ExplosionEffect(double x, double y, double radius) {
         this.x = x;
         this.y = y;
+        this.radius = radius;
 
-        int count = 30 + (int)(Math.random() * 20); // explosion to
+        int count = (int) (radius * 0.4); // radius càng lớn → nhiều mảnh
 
         for (int i = 0; i < count; i++) {
-            fragments.add(new Fragment(x, y));
+            fragments.add(new Fragment(x, y, radius));
         }
     }
 
     @Override
     public void update(double dt) {
+
         fragments.removeIf(f -> {
             f.update(dt);
             return f.isDead();
@@ -46,72 +48,22 @@ public class ExplosionEffect extends Effect {
         gc.setFill(Color.ORANGE);
 
         for (Fragment f : fragments) {
-            double sx = Constant.SCREEN_WIDTH / 2 + (f.x - camX);
-            double sy = Constant.SCREEN_HEIGHT / 2 + (f.y - camY);
+
+            double screenX =
+                    Constant.SCREEN_WIDTH / 2 + (f.x - camX);
+            double screenY =
+                    Constant.SCREEN_HEIGHT / 2 + (f.y - camY);
 
             gc.save();
-            gc.translate(sx, sy);
+            gc.translate(screenX, screenY);
             gc.rotate(f.rotation);
             gc.fillRect(
-                    -f.width / 2,
-                    -f.height / 2,
-                    f.width,
-                    f.height
+                    -f.size / 2,
+                    -f.size / 2,
+                    f.size,
+                    f.size
             );
             gc.restore();
         }
     }
-
-
-    class Fragment {
-
-        // world position
-        public double x, y;
-
-        // velocity
-        public double vx, vy;
-
-        // rotation
-        public double rotation;
-        public double rotationSpeed;
-
-        // lifetime
-        public double life;
-
-        // size
-        public double width;
-        public double height;
-
-        public Fragment(double x, double y) {
-            this.x = x;
-            this.y = y;
-
-            double angle = Math.random() * Math.PI * 2;
-            double speed = 200 + Math.random() * 300; // mạnh → bay xa
-
-            vx = Math.cos(angle) * speed;
-            vy = Math.sin(angle) * speed;
-
-            rotation = Math.random() * 360;
-            rotationSpeed = (Math.random() - 0.5) * 720;
-
-            width = 4 + Math.random() * 4;
-            height = 2 + Math.random() * 3;
-
-            life = 0.8 + Math.random() * 0.6;
-        }
-
-        public void update(double dt) {
-            vy += 700 * dt;          // gravity
-            x += vx * dt;
-            y += vy * dt;
-            rotation += rotationSpeed * dt;
-            life -= dt;
-        }
-
-        public boolean isDead() {
-            return life <= 0;
-        }
-    }
-
 }

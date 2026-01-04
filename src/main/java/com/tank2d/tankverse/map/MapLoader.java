@@ -2,6 +2,7 @@ package com.tank2d.tankverse.map;
 
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 
+import com.tank2d.tankverse.effect.EffectManager;
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.Player;
 import com.tank2d.tankverse.object.Bullet;
@@ -35,7 +36,7 @@ public class MapLoader {
     public int height;
     public Polygon testCollisionP;
     private ArrayList<Bullet> bullets = new ArrayList<>();
-
+    public EffectManager eManager = new EffectManager();
     public MapLoader(int id) {
         this.id = id;
         loadMap("/com/tank2d/tankverse/map/map" + id + ".tmj");
@@ -80,7 +81,7 @@ public class MapLoader {
             }
             layers.sort(Comparator.comparingInt(l -> l.id));
             System.out.println("✅ Loaded " + layers.size() + " layers.");
-
+            
             // ===== Load tilesets =====
             JSONArray jsonTilesets = json.getJSONArray("tilesets");
             int maxGid = 0;

@@ -20,7 +20,6 @@ public class Bullet extends GameObject {
                 "/com/tank2d/tankverse/bullet/bullet" + bulletId + ".png"
         )));
         System.out.println(" da tao dan thanh cong");
-
         this.angle = angle;
         this.ownerName = ownerName;
     }
@@ -43,6 +42,7 @@ public class Bullet extends GameObject {
         // Kiểm tra collision
         if (map.checkBulletCollision(polygon)) {
             active = false;
+            map.eManager.spawnExplosion(this.x, this.y, 200);
             //System.out.println("💥 Bullet hit a wall!");
         }
 
