@@ -1,6 +1,7 @@
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 package com.tank2d.tankverse.core;
 
+import com.tank2d.tankverse.entity.BotPlayer;
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.OtherPlayer;
 import com.tank2d.tankverse.entity.Player;
@@ -28,12 +29,15 @@ public class PlayPanel extends Pane implements Runnable {
     private final GraphicsContext gc;
     private final List<Entity> entities;
     List<OtherPlayer> players = new ArrayList<>();
-    private Player player;
+    public Player player;
     private AnimationTimer gameLoop;
     private MapLoader mapLoader;
     private boolean isHost = false;
     public GameClient client;
     private boolean running = false;
+    
+    // Bot system
+    private BotManager botManager;
 
     public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList, int mapId, GameClient client) {
         this.userName = userName;
@@ -48,8 +52,8 @@ public class PlayPanel extends Pane implements Runnable {
         this.entities = new ArrayList<>();
         this.players = new ArrayList<>();
 
-
-
+        // Initialize bot manager
+        this.botManager = new BotManager(mapLoader);
 
         // Nếu chưa có player nào, tạo 1 mặc định
         if (this.player == null) {
@@ -270,6 +274,10 @@ public class PlayPanel extends Pane implements Runnable {
         for (OtherPlayer oP : players) {
             oP.update(this);
         }
+        
+        // Update bots
+        botManager.updateAll(this);
+        
         mapLoader.updateBullets(this.player);
         mapLoader.updateTowers(player, this);
 
@@ -294,6 +302,10 @@ public class PlayPanel extends Pane implements Runnable {
         //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
+        
+        // Draw bots
+        botManager.drawAll(gc, player);
+        
         mapLoader.drawTowers(gc, player);
         mapLoader.drawBullets(gc, player);
     }
@@ -310,7 +322,39 @@ public class PlayPanel extends Pane implements Runnable {
                 return a.dmg;
             }
         }
+        
+        // Check if it's a bot
+        int botDamage = botManager.getDamage(name);
+        if (botDamage > 0) {
+            return botDamage;
+        }
+        
         return this.player.dmg;
 
+    }
+    
+    // ===== PUBLIC BOT METHODS =====
+    
+    /**
+     * Spawn bot(s) for testing
+     */
+    public void spawnBot() {
+        botManager.spawnBot();
+    }
+    
+    public void spawnBots(int count) {
+        botManager.spawnBots(count);
+    }
+    
+    public void spawnBotAt(double x, double y, String name) {
+        botManager.spawnBotAt(x, y, name);
+    }
+    
+    public void clearBots() {
+        botManager.clearAllBots();
+    }
+    
+    public BotManager getBotManager() {
+        return botManager;
     }
 }

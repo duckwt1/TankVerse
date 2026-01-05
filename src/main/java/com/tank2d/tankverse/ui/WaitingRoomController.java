@@ -7,6 +7,7 @@ import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.image.Image;
@@ -37,6 +38,10 @@ public class WaitingRoomController implements PacketListener {
     @FXML private Button btnReady;
     @FXML private Button btnStartGame;
     @FXML private Button btnLeaveRoom;
+    
+    // Bot selection
+    @FXML private ComboBox<String> cmbBotCount;
+    @FXML private Label lblBotInfo;
 
     private GameClient client;
     private int roomId;
@@ -46,6 +51,7 @@ public class WaitingRoomController implements PacketListener {
     private String selectedMap = "map1"; // Default map
     private int currentMapIndex = 0; // For carousel navigation (0=map1, 1=map2, 2=map3)
     private boolean isUpdatingFromServer = false; // Flag to prevent infinite loop
+    private int botCount = 0; // Number of bots to spawn
 
     public void setClient(GameClient client) {
         this.client = client;
@@ -68,7 +74,9 @@ public class WaitingRoomController implements PacketListener {
 
             List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
             int mapId = getInt(p.data.getOrDefault("mapId", 1), 1);
-
+            
+            // Get bot count from server
+            int serverBotCount = getInt(p.data.getOrDefault("botCount", 0), 0);
 
             // === NHẬN DANH SÁCH PEERS TỪ SERVER ===
             List<Map<String, Object>> peers = (List<Map<String, Object>>) p.data.get("peers");
@@ -79,6 +87,12 @@ public class WaitingRoomController implements PacketListener {
 
             // Tạo PlayPanel
             PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId, client);
+            
+            // Spawn bots
+            if (serverBotCount > 0) {
+                System.out.println("[Client] Spawning " + serverBotCount + " bots...");
+                playPanel.spawnBots(serverBotCount);
+            }
 
             Stage stage = (Stage) lblStatus.getScene().getWindow();
             Scene scene = new Scene(playPanel);
@@ -133,6 +147,11 @@ public class WaitingRoomController implements PacketListener {
         // Hide next/prev buttons for non-host (cleaner look)
         btnPrevMap.setVisible(host);
         btnNextMap.setVisible(host);
+        
+        // Enable bot selection for host only
+        if (cmbBotCount != null) {
+            cmbBotCount.setDisable(!host);
+        }
 //        if (host) {
 //            reportUdpPortOnce(); // 🔥 HOST CŨNG PHẢI BÁO
 //        }
@@ -153,6 +172,16 @@ public class WaitingRoomController implements PacketListener {
             listPlayers.getItems().add("(Waiting for players...)");
         } else {
             System.out.println("[WaitingRoom] ERROR: ListView is NULL after initialization!");
+        }
+        
+        // Initialize bot count combo box
+        if (cmbBotCount != null) {
+            cmbBotCount.getItems().addAll("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
+            cmbBotCount.setValue("0");
+            cmbBotCount.setDisable(true); // Disabled by default, enabled for host
+            
+            // Listen for changes
+            cmbBotCount.setOnAction(e -> onBotCountChanged());
         }
 
         // Initialize map display
@@ -236,6 +265,23 @@ public class WaitingRoomController implements PacketListener {
         currentMapIndex = (currentMapIndex + 1) % 3; // Wrap around
         showMapPreview(currentMapIndex);
     }
+    
+    private void onBotCountChanged() {
+        if (!isHost) return;
+        
+        String selected = cmbBotCount.getValue();
+        if (selected != null) {
+            botCount = Integer.parseInt(selected);
+            System.out.println("[WaitingRoom] Host selected " + botCount + " bots");
+            
+            // Send to server to broadcast to all clients
+            if (client != null && !isUpdatingFromServer) {
+                Packet packet = new Packet(PacketType.BOT_COUNT_CHANGED);
+                packet.data.put("botCount", botCount);
+                client.sendPacket(packet);
+            }
+        }
+    }
 
     @FXML
     private void onSelectMap1() {
@@ -266,7 +312,11 @@ public class WaitingRoomController implements PacketListener {
     private void onStartGame() {
         if (client == null) return;
         lblStatus.setText("Starting game...");
-        client.startGame();
+        
+        // Send bot count along with start game request
+        Packet packet = new Packet(PacketType.START_GAME);
+        packet.data.put("botCount", botCount);
+        client.sendPacket(packet);
     }
 
     @FXML
@@ -384,6 +434,22 @@ public class WaitingRoomController implements PacketListener {
             lblStatus.setText("Host selected: Map " + (index + 1));
             System.out.println("[WaitingRoom] Received map selection from server: " + mapName);
             isUpdatingFromServer = false; // Reset flag
+        });
+    }
+    
+    /**
+     * Handle bot count update from server (broadcast from host)
+     */
+    public void onBotCountUpdate(int count) {
+        Platform.runLater(() -> {
+            isUpdatingFromServer = true;
+            botCount = count;
+            if (cmbBotCount != null) {
+                cmbBotCount.setValue(String.valueOf(count));
+            }
+            lblStatus.setText("Host selected " + count + " bots");
+            System.out.println("[WaitingRoom] Bot count updated: " + count);
+            isUpdatingFromServer = false;
         });
     }
 

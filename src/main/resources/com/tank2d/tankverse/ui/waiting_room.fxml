@@ -138,6 +138,25 @@
                     <font><Font size="13.0" /></font>
                 </Label>
 
+                <!-- Bot Selection -->
+                <VBox spacing="5.0" style="-fx-padding: 10 0 0 0;">
+                    <Label text="🤖 AI Bots (Host Only):" textFill="#704214">
+                        <font>
+                            <Font name="System Bold" size="14.0" />
+                        </font>
+                    </Label>
+                    <HBox spacing="10.0" alignment="CENTER_LEFT">
+                        <Label text="Number of Bots:" textFill="#8a6f47">
+                            <font><Font size="13.0" /></font>
+                        </Label>
+                        <javafx.scene.control.ComboBox fx:id="cmbBotCount" prefWidth="80.0"
+                            style="-fx-background-color: #fff8e1; -fx-border-color: #8a6f47; -fx-border-width: 2;" />
+                        <Label fx:id="lblBotInfo" text="(Bots will auto-attack players)" textFill="#a08050">
+                            <font><Font size="11.0" style="-fx-font-style: italic;" /></font>
+                        </Label>
+                    </HBox>
+                </VBox>
+
             </VBox>
         </HBox>
 

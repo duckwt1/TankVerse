@@ -107,6 +107,12 @@ public class GameClient {
                         String mapName = (String) p.data.get("map");
                         listener.onMapSelected(mapName);
                     }
+                    case BOT_COUNT_CHANGED -> {
+                        int botCount = toInt(p.data.get("botCount"));
+                        if (listener instanceof com.tank2d.tankverse.ui.WaitingRoomController) {
+                            ((com.tank2d.tankverse.ui.WaitingRoomController) listener).onBotCountUpdate(botCount);
+                        }
+                    }
                     case START_GAME -> listener.onGameStart(p);
                     case SHOP_LIST_DATA -> {
                         List<Map<String, Object>> items = (List<Map<String, Object>>) p.data.get("items");
