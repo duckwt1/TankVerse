@@ -53,11 +53,19 @@ public class Player extends Entity {
     private boolean isRespawning = false;
     private long respawnEndTime = 0;          // thời điểm kết thúc countdown
     private final int RESPAWN_SECONDS = 10;   // 10s
+    // ===== LIFE SYSTEM =====
+    private boolean isOut = false;
+    private long outEndTime = 0;
+    private final int OUT_SECONDS = 3;
+    // ===== WIN SYSTEM =====
+    private boolean isWin = false;
+    private long winEndTime = 0;
+    private final int WIN_SECONDS = 3;
 
     // spawn position (có thể set từ ngoài)
     private double spawnX;
     private double spawnY;
-
+    int maxLife = 3;
 
     public Player(double x, double y, Polygon solidArea, double speed, MapLoader mapLoader, String playerName) {
         super(x, y, solidArea, speed, mapLoader);
@@ -158,10 +166,19 @@ public class Player extends Entity {
 
     @Override
     public void update(PlayPanel panel) {
+        if (isWin) {
+            updateWinCountdown(panel);
+            return;
+        }
+        if (isOut) {
+            updateOutCountdown(panel);
+            return;
+        }
         if (!this.isAlive) {
             updateRespawnCountdown();
             return;
         }
+
 
         if (action == Constant.ACTION_SHOOT)
         {
@@ -178,8 +195,13 @@ public class Player extends Entity {
                 this.isAlive = false;
                 this.die++;
 
-                startRespawnCountdown(); // <<< thêm dòng này
+                if (die >= maxLife) {
+                    startOutCountdown();   // ❗ HẾT MẠNG
+                } else {
+                    startRespawnCountdown(); // còn mạng → hồi sinh
+                }
             }
+
 
         }
         // ===== HP SMOOTH UPDATE =====
@@ -248,6 +270,7 @@ public class Player extends Entity {
         } else {
             startBounce(dx, dy);
         }
+        checkWinCondition(panel);
 
 
 
@@ -292,6 +315,46 @@ public class Player extends Entity {
             respawn();
         }
     }
+    private void updateWinCountdown(PlayPanel panel) {
+        long now = System.currentTimeMillis();
+        if (now >= winEndTime) {
+            panel.forceQuitGame(); // về main menu
+        }
+    }
+
+    private void checkWinCondition(PlayPanel panel) {
+        if (isWin || isOut) return;
+        if (!this.isAlive) return;
+
+        boolean allEnemyDead = true;
+
+        for (var op : panel.players) {
+            if (op.isAlive && op.hp > 0 || op.dieCount < 3) {
+                allEnemyDead = false;
+                break;
+            }
+        }
+
+        if (allEnemyDead && panel.players.size() > 0) {
+            startWinCountdown();
+        }
+    }
+    private void startWinCountdown() {
+        isWin = true;
+        winEndTime = System.currentTimeMillis() + WIN_SECONDS * 1000L;
+
+        // khóa input
+        up = down = left = right = backward = false;
+    }
+
+
+    private void updateOutCountdown(PlayPanel panel) {
+        long now = System.currentTimeMillis();
+        if (now >= outEndTime) {
+            panel.forceQuitGame(); // <<< thoát game
+        }
+    }
+
 
     private void respawn() {
         // reset stats
@@ -380,7 +443,77 @@ public class Player extends Entity {
         gc.setFill(Color.RED);
         gc.fillText(String.format("x: %.1f, y: %.1f  angle: %.1f°", x, y, bodyAngle), 10, 20);
         drawKDA(gc);
+        if (isOut) {
+            drawOutOverlay(gc);
+            return;
+        }
+        if (isWin) {
+            drawWinOverlay(gc);
+            return;
+        }
+
+
+
+
     }
+    private void drawWinOverlay(GraphicsContext gc) {
+        long now = System.currentTimeMillis();
+        long remainMs = Math.max(0, winEndTime - now);
+        int remainSec = (int) Math.ceil(remainMs / 1000.0);
+
+        gc.save();
+
+        // nền mờ
+        gc.setFill(Color.rgb(0, 0, 0, 0.70));
+        gc.fillRect(0, 0, Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
+
+        // text
+        String line1 = "VICTORY";
+        String line2 = "Returning to lobby in " + remainSec + "s";
+
+        gc.setFill(Color.GOLD);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.EXTRA_BOLD, 56));
+        drawCenteredText(gc, line1, Constant.SCREEN_HEIGHT / 2.0 - 20);
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 24));
+        drawCenteredText(gc, line2, Constant.SCREEN_HEIGHT / 2.0 + 30);
+
+        gc.restore();
+    }
+
+    private void drawOutOverlay(GraphicsContext gc) {
+        long now = System.currentTimeMillis();
+        long remainMs = Math.max(0, outEndTime - now);
+        int remainSec = (int) Math.ceil(remainMs / 1000.0);
+
+        gc.save();
+
+        // nền mờ
+        gc.setFill(Color.rgb(0, 0, 0, 0.75));
+        gc.fillRect(0, 0, Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
+
+        // text chính
+        String line1 = "YOU ARE OUT";
+        String line2 = "Leaving game in " + remainSec + "s";
+
+        gc.setFill(Color.WHITE);
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 48));
+        drawCenteredText(gc, line1, Constant.SCREEN_HEIGHT / 2.0 - 20);
+
+        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, 24));
+        drawCenteredText(gc, line2, Constant.SCREEN_HEIGHT / 2.0 + 30);
+
+        gc.restore();
+    }
+    private void drawCenteredText(GraphicsContext gc, String text, double y) {
+        javafx.scene.text.Text t = new javafx.scene.text.Text(text);
+        t.setFont(gc.getFont());
+        double w = t.getLayoutBounds().getWidth();
+        gc.fillText(text, (Constant.SCREEN_WIDTH - w) / 2.0, y);
+    }
+
+
     private void drawHp(GraphicsContext gc)
     {
         double centerX = Constant.SCREEN_WIDTH / 2.0;
@@ -411,6 +544,14 @@ public class Player extends Entity {
         gc.strokeRect(barX, barY, barWidth, barHeight);
 
     }
+    private void startOutCountdown() {
+        isOut = true;
+        outEndTime = System.currentTimeMillis() + OUT_SECONDS * 1000L;
+
+        // disable input
+        up = down = left = right = backward = false;
+    }
+
     private void drawRespawnOverlay(GraphicsContext gc) {
         if (!isRespawning) return;
 
@@ -463,44 +604,58 @@ public class Player extends Entity {
         gunAngle = Math.atan2(dy, dx);
     }
     private void drawKDA(GraphicsContext gc) {
-        // Text like: "11 | 0 | 2"
-        String kdaText = kill + " | " + die  ;
 
-        // Corner top-right padding
-        double padding = 12;
-        double x = Constant.SCREEN_WIDTH - padding;
-        double y = 24; // a bit below the top edge
+        String kdaText = kill + "  |  " + die;
+
+        // ===== POSITION: CENTER TOP =====
+        double centerX = Constant.SCREEN_WIDTH / 2.0;
+        double y = 30; // khoảng cách từ top xuống
 
         gc.save();
 
-        // Optional: background box for readability
-        double fontSize = 18;
-        gc.setFont(javafx.scene.text.Font.font("Arial", javafx.scene.text.FontWeight.BOLD, fontSize));
+        // ===== FONT =====
+        double fontSize = 22;
+        gc.setFont(javafx.scene.text.Font.font(
+                "Arial",
+                javafx.scene.text.FontWeight.BOLD,
+                fontSize
+        ));
 
-        // Measure text width (JavaFX way)
+        // ===== MEASURE TEXT =====
         javafx.scene.text.Text temp = new javafx.scene.text.Text(kdaText);
         temp.setFont(gc.getFont());
         double textW = temp.getLayoutBounds().getWidth();
         double textH = temp.getLayoutBounds().getHeight();
 
-        double boxPadX = 10;
-        double boxPadY = 6;
+        // ===== BOX SIZE =====
+        double padX = 18;
+        double padY = 8;
 
-        double boxX = (Constant.SCREEN_WIDTH - padding) - textW - boxPadX * 2;
-        double boxY = y - textH + 4 - boxPadY; // adjust baseline a little
-        double boxW = textW + boxPadX * 2;
-        double boxH = textH + boxPadY * 2;
+        double boxW = textW + padX * 2;
+        double boxH = textH + padY * 2;
 
+        double boxX = centerX - boxW / 2;
+        double boxY = y;
+
+        // ===== DRAW BACKGROUND =====
         gc.setFill(Color.rgb(0, 0, 0, 0.55));
-        gc.fillRoundRect(boxX, boxY, boxW, boxH, 10, 10);
+        gc.fillRoundRect(boxX, boxY, boxW, boxH, 16, 16);
 
-        // Draw text aligned to top-right
+        // ===== BORDER =====
+        gc.setStroke(Color.rgb(255, 255, 255, 0.6));
+        gc.setLineWidth(2);
+        gc.strokeRoundRect(boxX, boxY, boxW, boxH, 16, 16);
+
+        // ===== DRAW TEXT =====
         gc.setFill(Color.WHITE);
-        gc.fillText(kdaText, x - textW, y);
+        gc.fillText(
+                kdaText,
+                centerX - textW / 2,
+                boxY + boxH / 2 + textH / 4
+        );
 
         gc.restore();
     }
-
 
 
     // ---- Phím điều khiển ----

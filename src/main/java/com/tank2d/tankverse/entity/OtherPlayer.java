@@ -57,7 +57,7 @@ public class OtherPlayer extends Entity{
     private double gunPivotX;
     private double gunPivotY;
     private Player player;
-
+    public int dieCount = 0;
     public OtherPlayer(double x, double y, Polygon solidArea, double speed, MapLoader mapLoader, String playerName, Player player) {
         super(x, y, solidArea, speed, mapLoader);
         this.playerName = playerName;
@@ -131,6 +131,7 @@ public class OtherPlayer extends Entity{
             if (hp < 0){
                 hp = 0;
                 this.isAlive = false;
+                dieCount ++;
                 if (collide.ownerName.equals(player.getName()))
                 {
                     player.kill ++;
