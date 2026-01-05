@@ -3,6 +3,7 @@ package com.tank2d.tankverse.ui;
 import com.tank2d.tankverse.core.GameClient;
 import com.tank2d.tankverse.core.PacketListener;
 import com.tank2d.tankverse.entity.ShopItem;
+import com.tank2d.tankverse.utils.AssetLoader;
 import com.tank2d.tankverse.utils.Packet;
 import com.tank2d.tankverse.utils.PacketType;
 import javafx.application.Platform;
@@ -88,14 +89,9 @@ public class ShopController implements PacketListener {
         imgView.setFitHeight(60);
         imgView.setPreserveRatio(true);
         
-        // Try to load item icon, fallback to placeholder
-        try {
-            Image itemImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/ui/item_icon.png"));
-            imgView.setImage(itemImage);
-        } catch (Exception e) {
-            // No icon available, use colored background
-            imgView.setStyle("-fx-background-color: #4CAF50;");
-        }
+        // Load item image from HTTP server
+        Image itemImage = AssetLoader.loadItemImage(item.name);
+        imgView.setImage(itemImage);
         
         // Name
         Label lblName = new Label(item.name);
@@ -250,9 +246,10 @@ public class ShopController implements PacketListener {
                 String.format(" (-%d%%)", (int)(item.discount * 100)));
         }
         
-        // Hide image placeholder
+        // Load item image from HTTP server
+        Image itemImage = AssetLoader.loadItemImage(item.name);
+        imgDetailItem.setImage(itemImage);
         lblImagePlaceholder.setVisible(false);
-        imgDetailItem.setImage(null);
     }
     
     private void displayTankDetail(ShopItem tank) {
@@ -309,23 +306,7 @@ public class ShopController implements PacketListener {
     }
     
     private Image loadTankImage(String tankName) {
-        try {
-            String imagePath = null;
-            if (tankName.toLowerCase().contains("basic")) {
-                imagePath = "/com/tank2d/tankverse/tank/basic_tank.png";
-            } else if (tankName.toLowerCase().contains("heavy")) {
-                imagePath = "/com/tank2d/tankverse/tank/heavy_tank.png";
-            } else if (tankName.toLowerCase().contains("light")) {
-                imagePath = "/com/tank2d/tankverse/tank/light_tank.png";
-            }
-            
-            if (imagePath != null) {
-                return new Image(getClass().getResourceAsStream(imagePath));
-            }
-        } catch (Exception e) {
-            System.err.println("[Shop] Failed to load tank image: " + e.getMessage());
-        }
-        return null;
+        return AssetLoader.loadTankImage(tankName);
     }
 
     public void setClient(GameClient client) {

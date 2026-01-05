@@ -2,6 +2,7 @@ package com.tank2d.tankverse.ui;
 
 import com.tank2d.tankverse.core.GameClient;
 import com.tank2d.tankverse.core.PacketListener;
+import com.tank2d.tankverse.utils.AssetLoader;
 import com.tank2d.tankverse.utils.Packet;
 import com.tank2d.tankverse.utils.PacketType;
 import javafx.application.Platform;
@@ -210,17 +211,7 @@ public class InventoryController implements PacketListener {
                      "-fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8; -fx-cursor: hand;");
     }
     private Image loadTankImage(String tankName) {
-        try {
-            String imagePath = "/com/tank2d/tankverse/tank/" + tankName.toLowerCase().replace(" ", "_") + ".png";
-            return new Image(getClass().getResourceAsStream(imagePath));
-        } catch (Exception e) {
-            // Return default tank image or null
-            try {
-                return new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/default_tank.png"));
-            } catch (Exception ex) {
-                return null;
-            }
-        }
+        return AssetLoader.loadTankImage(tankName);
     }
     @FXML
     private void onUseItem() {
