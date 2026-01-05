@@ -2,17 +2,22 @@ package com.tank2d.tankverse.map;
 
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 
+import com.tank2d.tankverse.core.GameClient;
 import com.tank2d.tankverse.core.PlayPanel;
 import com.tank2d.tankverse.effect.EffectManager;
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.Player;
 import com.tank2d.tankverse.object.Bullet;
 import com.tank2d.tankverse.object.Tower;
+import com.tank2d.tankverse.ui.MainMenuController;
+import com.tank2d.tankverse.ui.UiNavigator;
 import com.tank2d.tankverse.utils.Constant;
+import javafx.scene.Scene;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 import javafx.scene.image.WritableImage;
 import javafx.scene.paint.Color;
+import javafx.stage.Stage;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.w3c.dom.Document;
@@ -40,14 +45,15 @@ public class MapLoader {
     private ArrayList<Bullet> bullets = new ArrayList<>();
     public EffectManager eManager = new EffectManager();
     private ArrayList<Tower> towers = new ArrayList<>();
-
-    public MapLoader(int id) {
+    private PlayPanel gp;
+    public MapLoader(int id, PlayPanel gp) {
         this.id = id;
         loadMap("/com/tank2d/tankverse/map/map" + id + ".tmj");
 
         // ===== Spawn towers (world coords) =====
         addTower(new Tower(500, 400, 1));
         addTower(new Tower(900, 700, 1));
+        this.gp = gp;
     }
 
 
@@ -303,7 +309,15 @@ public class MapLoader {
             Tower t = towers.get(i);
             t.update(player, this);
 
-            if (!t.isAlive()) continue;
+            if (!t.isAlive()){
+                gp.stopGame();
+
+                MainMenuController controller = UiNavigator.loadSceneWithController("main_menu.fxml");
+                controller.setClient(gp.client);
+                gp.client.setPacketListener(controller);
+                
+                continue;
+            }
 
             // Check tower vs bullets
             Rectangle towerBox = t.getHitbox();

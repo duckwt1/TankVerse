@@ -99,7 +99,7 @@ public class P2PClient extends Thread {
                         );
                     } catch (Exception ignored) {}
                 }
-                if (p.action != Constant.ACTION_NONE)
+                if (p.action == Constant.ACTION_CHARGE)
                 {
                     p.action = Constant.ACTION_NONE;
                 }

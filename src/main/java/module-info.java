@@ -4,6 +4,7 @@ module com.tank2d.tankverse {
     requires org.json;
     requires com.google.gson;
     requires java.desktop;
+    requires javafx.graphics;
 
 
     opens com.tank2d.tankverse.ui to javafx.fxml;

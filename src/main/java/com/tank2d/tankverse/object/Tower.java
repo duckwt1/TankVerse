@@ -10,7 +10,7 @@ import javafx.scene.paint.Color;
 import java.awt.*;
 
 public class Tower extends GameObject {
-    public int maxHp = 200;
+    public int maxHp = 50;
     public int hp = maxHp;
 
     private Rectangle hitbox; // world-space
@@ -27,7 +27,6 @@ public class Tower extends GameObject {
         int h = (int) image.getHeight();
         hitbox = new Rectangle((int)(x - w/2), (int)(y - h/2), w, h);
     }
-
     @Override
     public void update(Player player, MapLoader map) {
         // tower đứng yên -> chỉ cần sync hitbox theo x,y (nếu sau này tower có move)
@@ -36,7 +35,6 @@ public class Tower extends GameObject {
         int h = (int) image.getHeight();
         hitbox.setBounds((int)(x - w/2), (int)(y - h/2), w, h);
     }
-
     public void takeDamage(int dmg) {
         if (!alive) return;
         hp -= dmg;
@@ -45,7 +43,6 @@ public class Tower extends GameObject {
             alive = false;
         }
     }
-
     public boolean isAlive() {
         return alive;
     }

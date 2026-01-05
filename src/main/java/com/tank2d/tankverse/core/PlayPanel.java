@@ -32,14 +32,15 @@ public class PlayPanel extends Pane implements Runnable {
     private AnimationTimer gameLoop;
     private MapLoader mapLoader;
     private boolean isHost = false;
+    public GameClient client;
+    private boolean running = false;
 
-
-    public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList, int mapId) {
+    public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList, int mapId, GameClient client) {
         this.userName = userName;
-        
+        this.client = client;
         // Use mapId from parameter
         System.out.println("🗺️ Loading map with ID: " + mapId);
-        this.mapLoader = new MapLoader(mapId);
+        this.mapLoader = new MapLoader(mapId, this);
         this.canvas = new Canvas(Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
         this.gc = canvas.getGraphicsContext2D();
         getChildren().add(canvas);
@@ -90,11 +91,13 @@ public class PlayPanel extends Pane implements Runnable {
             found.setRight(playerState.right);
             found.setLeft(playerState.left);
             found.setBackward(playerState.backward);
-            if (found.isAlive == false && playerState.hp > 30)
+            if (found.isAlive == false && playerState.hp >= 15)
             {
                 found.hp = playerState.hp;
                 found.isAlive = true;
             }
+            else if (found.isAlive == true)
+                found.hp = playerState.hp;
             found.bullet = playerState.bullet;
             found.action = playerState.action;
         }
@@ -207,15 +210,19 @@ public class PlayPanel extends Pane implements Runnable {
 
     @Override
     public void run() {
-        // Fixed timestep: 60 FPS
-        final double FRAME_TIME = 1_000_000_000.0 / 60.0; // 16.666ms
+        if (running) return; // ❗ chống start nhiều lần
+        running = true;
+
+        final double FRAME_TIME = 1_000_000_000.0 / 60.0;
         final double[] accumulator = {0};
 
-        AnimationTimer gameLoop = new AnimationTimer() {
+        gameLoop = new AnimationTimer() {
             private long lastTime = 0;
 
             @Override
             public void handle(long now) {
+                if (!running) return;
+
                 if (lastTime == 0) {
                     lastTime = now;
                     return;
@@ -225,18 +232,36 @@ public class PlayPanel extends Pane implements Runnable {
                 lastTime = now;
                 accumulator[0] += delta;
 
-                // update game exactly 60 times per second
                 while (accumulator[0] >= FRAME_TIME) {
                     updateFixed60FPS();
                     accumulator[0] -= FRAME_TIME;
                 }
 
-                draw(); // render as fast as possible
+                draw();
             }
         };
 
         gameLoop.start();
     }
+    public void stopGame() {
+        System.out.println("[PlayPanel] STOP GAME");
+
+        running = false;
+
+        if (gameLoop != null) {
+            gameLoop.stop();
+            gameLoop = null;
+        }
+
+        // clear data
+        players.clear();
+        entities.clear();
+
+        setOnKeyPressed(null);
+        setOnKeyReleased(null);
+        setOnMouseMoved(null);
+    }
+
     private void updateFixed60FPS() {
 
         player.update(this);
