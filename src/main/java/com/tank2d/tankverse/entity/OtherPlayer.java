@@ -64,7 +64,7 @@ public class OtherPlayer extends Entity{
         this.mapLoader = mapLoader;
         this.player = player;
         getImages();
-        maxHp = 100;
+        maxHp = 30;
         hp = maxHp;
         lastHp = hp;
         bullet = 4;

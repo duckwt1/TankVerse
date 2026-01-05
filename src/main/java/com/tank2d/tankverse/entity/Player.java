@@ -65,7 +65,7 @@ public class Player extends Entity {
         this.playerName = playerName;
         this.mapLoader = mapLoader;
         getImages();
-        maxHp = 100;
+        maxHp = 30;
         hp = maxHp;
         lastHp = hp;
         bullet = 100;
@@ -138,9 +138,6 @@ public class Player extends Entity {
             solidArea.addPoint((int)(cx + rx), (int)(cy + ry));
         }
     }
-
-
-
 
     @Override
     public void getImages() {

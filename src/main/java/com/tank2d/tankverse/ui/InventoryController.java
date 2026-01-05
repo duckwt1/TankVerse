@@ -209,7 +209,6 @@ public class InventoryController implements PacketListener {
         card.setStyle("-fx-background-color: #e3f2fd; -fx-border-color: #2196F3; -fx-border-width: 3; " +
                      "-fx-border-radius: 5; -fx-background-radius: 5; -fx-padding: 8; -fx-cursor: hand;");
     }
-
     private Image loadTankImage(String tankName) {
         try {
             String imagePath = "/com/tank2d/tankverse/tank/" + tankName.toLowerCase().replace(" ", "_") + ".png";
@@ -223,7 +222,6 @@ public class InventoryController implements PacketListener {
             }
         }
     }
-
     @FXML
     private void onUseItem() {
         if (selectedItem == null) return;

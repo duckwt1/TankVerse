@@ -78,7 +78,7 @@ public class WaitingRoomController implements PacketListener {
             }
 
             // Tạo PlayPanel
-            PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId);
+            PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId, client);
 
             Stage stage = (Stage) lblStatus.getScene().getWindow();
             Scene scene = new Scene(playPanel);
