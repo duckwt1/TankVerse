@@ -51,8 +51,8 @@ public class MapLoader {
         loadMap("/com/tank2d/tankverse/map/map" + id + ".tmj");
 
         // ===== Spawn towers (world coords) =====
-        addTower(new Tower(500, 400, 1));
-        addTower(new Tower(900, 700, 1));
+        //addTower(new Tower(500, 400, 1));
+        //addTower(new Tower(900, 700, 1));
         this.gp = gp;
     }
 

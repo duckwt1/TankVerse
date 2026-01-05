@@ -5,6 +5,8 @@ import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.OtherPlayer;
 import com.tank2d.tankverse.entity.Player;
 import com.tank2d.tankverse.map.MapLoader;
+import com.tank2d.tankverse.ui.MainMenuController;
+import com.tank2d.tankverse.ui.UiNavigator;
 import com.tank2d.tankverse.utils.Constant;
 import com.tank2d.tankverse.utils.PlayerState;
 import javafx.animation.AnimationTimer;
@@ -13,12 +15,19 @@ import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
+import javafx.scene.control.Button;
+import javafx.geometry.Pos;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 
 import static com.tank2d.tankverse.utils.DataTypeParser.toInt;
 
@@ -27,7 +36,7 @@ public class PlayPanel extends Pane implements Runnable {
     private final Canvas canvas;
     private final GraphicsContext gc;
     private final List<Entity> entities;
-    List<OtherPlayer> players = new ArrayList<>();
+    public List<OtherPlayer> players = new ArrayList<>();
     private Player player;
     private AnimationTimer gameLoop;
     private MapLoader mapLoader;
@@ -44,6 +53,7 @@ public class PlayPanel extends Pane implements Runnable {
         this.canvas = new Canvas(Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
         this.gc = canvas.getGraphicsContext2D();
         getChildren().add(canvas);
+        addQuitButton();
 
         this.entities = new ArrayList<>();
         this.players = new ArrayList<>();
@@ -297,6 +307,17 @@ public class PlayPanel extends Pane implements Runnable {
         mapLoader.drawTowers(gc, player);
         mapLoader.drawBullets(gc, player);
     }
+    public void forceQuitGame() {
+        stopGame();
+
+        javafx.application.Platform.runLater(() -> {
+            MainMenuController controller =
+                    UiNavigator.loadSceneWithController("main_menu.fxml");
+            controller.setClient(client);
+            client.setPacketListener(controller);
+        });
+    }
+
 
     public int getDamage(String name)
     {
@@ -313,4 +334,96 @@ public class PlayPanel extends Pane implements Runnable {
         return this.player.dmg;
 
     }
+
+    private void addQuitButton() {
+        Button btnQuit = new Button("QUIT GAME");
+        btnQuit.setPrefSize(140, 45);
+        btnQuit.setLayoutX(Constant.SCREEN_WIDTH - 160);
+        btnQuit.setLayoutY(20);
+
+        btnQuit.setStyle("""
+        -fx-background-color: #c54245;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-font-size: 14;
+        -fx-background-radius: 10;
+        -fx-cursor: hand;
+    """);
+
+        btnQuit.setOnAction(e -> showQuitConfirm());
+
+        getChildren().add(btnQuit);
+    }
+
+    private void showQuitConfirm() {
+
+        // nền mờ che game
+        Pane overlay = new Pane();
+        overlay.setPrefSize(Constant.SCREEN_WIDTH, Constant.SCREEN_HEIGHT);
+        overlay.setStyle("-fx-background-color: rgba(0,0,0,0.6);");
+
+        // hộp confirm
+        VBox box = new VBox(15);
+        box.setAlignment(Pos.CENTER);
+        box.setPrefSize(360, 180);
+        box.setLayoutX((Constant.SCREEN_WIDTH - 360) / 2);
+        box.setLayoutY((Constant.SCREEN_HEIGHT - 180) / 2);
+        box.setStyle("""
+        -fx-background-color: #f4e8c1;
+        -fx-border-color: #704214;
+        -fx-border-width: 4;
+        -fx-background-radius: 12;
+        -fx-border-radius: 12;
+    """);
+
+        Label lbl = new Label("❓ Do you really want to quit the game?");
+        lbl.setStyle("""
+        -fx-font-size: 15;
+        -fx-font-weight: bold;
+        -fx-text-fill: #704214;
+    """);
+
+        Button btnYes = new Button("YES");
+        Button btnNo  = new Button("NO");
+
+        btnYes.setPrefSize(110, 40);
+        btnNo.setPrefSize(110, 40);
+
+        btnYes.setStyle("""
+        -fx-background-color: #c54245;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-background-radius: 8;
+    """);
+
+        btnNo.setStyle("""
+        -fx-background-color: #7a9c8e;
+        -fx-text-fill: white;
+        -fx-font-weight: bold;
+        -fx-background-radius: 8;
+    """);
+
+        // YES → quit game
+        btnYes.setOnAction(e -> {
+            stopGame();
+
+            MainMenuController controller =
+                    UiNavigator.loadSceneWithController("main_menu.fxml");
+            controller.setClient(client);
+            client.setPacketListener(controller);
+        });
+
+        // NO → đóng hộp
+        btnNo.setOnAction(e -> getChildren().remove(overlay));
+
+        HBox buttons = new HBox(20, btnYes, btnNo);
+        buttons.setAlignment(Pos.CENTER);
+
+        box.getChildren().addAll(lbl, buttons);
+        overlay.getChildren().add(box);
+
+        getChildren().add(overlay);
+    }
+
+
 }
