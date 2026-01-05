@@ -1,6 +1,7 @@
 // Pham Ngoc Duc - Lớp 23JIT - Trường VKU - MSSV: 23IT059
 package com.tank2d.tankverse.core;
 
+import com.tank2d.tankverse.entity.BotPlayer;
 import com.tank2d.tankverse.entity.Entity;
 import com.tank2d.tankverse.entity.OtherPlayer;
 import com.tank2d.tankverse.entity.Player;
@@ -18,16 +19,14 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Pane;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.VBox;
 import javafx.geometry.Pos;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
-import javafx.scene.control.Label;
-import javafx.scene.layout.VBox;
 
 import static com.tank2d.tankverse.utils.DataTypeParser.toInt;
 
@@ -37,12 +36,15 @@ public class PlayPanel extends Pane implements Runnable {
     private final GraphicsContext gc;
     private final List<Entity> entities;
     public List<OtherPlayer> players = new ArrayList<>();
-    private Player player;
+    public Player player;
     private AnimationTimer gameLoop;
     private MapLoader mapLoader;
     private boolean isHost = false;
     public GameClient client;
     private boolean running = false;
+
+    // Bot system
+    private BotManager botManager;
 
     public PlayPanel(String userName, int playerCount, List<Map<String, Object>> playerDataList, int mapId, GameClient client) {
         this.userName = userName;
@@ -58,8 +60,8 @@ public class PlayPanel extends Pane implements Runnable {
         this.entities = new ArrayList<>();
         this.players = new ArrayList<>();
 
-
-
+        // Initialize bot manager
+        this.botManager = new BotManager(mapLoader);
 
         // Nếu chưa có player nào, tạo 1 mặc định
         if (this.player == null) {
@@ -253,6 +255,7 @@ public class PlayPanel extends Pane implements Runnable {
 
         gameLoop.start();
     }
+
     public void stopGame() {
         System.out.println("[PlayPanel] STOP GAME");
 
@@ -280,6 +283,10 @@ public class PlayPanel extends Pane implements Runnable {
         for (OtherPlayer oP : players) {
             oP.update(this);
         }
+
+        // Update bots
+        botManager.updateAll(this);
+
         mapLoader.updateBullets(this.player);
         mapLoader.updateTowers(player, this);
 
@@ -304,9 +311,14 @@ public class PlayPanel extends Pane implements Runnable {
         //player.drawSolidArea(gc);
         //mapLoader.debugDrawTileCoordinates(gc, player);
         for (OtherPlayer oP : players) oP.draw(gc);
+
+        // Draw bots
+        botManager.drawAll(gc, player);
+
         mapLoader.drawTowers(gc, player);
         mapLoader.drawBullets(gc, player);
     }
+
     public void forceQuitGame() {
         stopGame();
 
@@ -317,7 +329,6 @@ public class PlayPanel extends Pane implements Runnable {
             client.setPacketListener(controller);
         });
     }
-
 
     public int getDamage(String name)
     {
@@ -331,8 +342,40 @@ public class PlayPanel extends Pane implements Runnable {
                 return a.dmg;
             }
         }
+
+        // Check if it's a bot
+        int botDamage = botManager.getDamage(name);
+        if (botDamage > 0) {
+            return botDamage;
+        }
+
         return this.player.dmg;
 
+    }
+
+    // ===== PUBLIC BOT METHODS =====
+
+    /**
+     * Spawn bot(s) for testing
+     */
+    public void spawnBot() {
+        botManager.spawnBot();
+    }
+
+    public void spawnBots(int count) {
+        botManager.spawnBots(count);
+    }
+
+    public void spawnBotAt(double x, double y, String name) {
+        botManager.spawnBotAt(x, y, name);
+    }
+
+    public void clearBots() {
+        botManager.clearAllBots();
+    }
+
+    public BotManager getBotManager() {
+        return botManager;
     }
 
     private void addQuitButton() {
@@ -424,6 +467,4 @@ public class PlayPanel extends Pane implements Runnable {
 
         getChildren().add(overlay);
     }
-
-
 }

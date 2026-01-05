@@ -10,6 +10,7 @@ import javafx.scene.image.Image;
 import javafx.scene.paint.Color;
 
 import java.awt.*;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -364,15 +365,14 @@ public class BotPlayer extends Entity {
     }
     
     /**
-     * Find nearest player
+     * Find nearest player (includes main player and other players in multiplayer)
      */
     private Player findNearestPlayer(PlayPanel panel) {
         Player nearest = null;
         double minDist = Double.MAX_VALUE;
         
-        // Tìm player gần nhất (panel.getPlayer() hoặc từ list)
+        // Check main player
         Player mainPlayer = panel.player;
-        
         if (mainPlayer != null && mainPlayer.isAlive) {
             double dist = distanceTo(mainPlayer);
             if (dist < DETECTION_RANGE && dist < minDist) {
@@ -381,16 +381,52 @@ public class BotPlayer extends Entity {
             }
         }
         
+        // Check all other players in multiplayer
+        for (OtherPlayer otherPlayer : panel.players) {
+            if (otherPlayer != null && otherPlayer.isAlive) {
+                double dist = distanceToOther(otherPlayer);
+                if (dist < DETECTION_RANGE && dist < minDist) {
+                    nearest = convertToPlayer(otherPlayer);
+                    minDist = dist;
+                }
+            }
+        }
+        
         return nearest;
     }
     
     /**
-     * Calculate distance to target
+     * Calculate distance to Player target
      */
     private double distanceTo(Player target) {
         double dx = target.getX() - x;
         double dy = target.getY() - y;
         return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    /**
+     * Calculate distance to OtherPlayer target
+     */
+    private double distanceToOther(OtherPlayer target) {
+        double dx = target.x - x;
+        double dy = target.y - y;
+        return Math.sqrt(dx * dx + dy * dy);
+    }
+    
+    /**
+     * Convert OtherPlayer to Player-like interface for AI targeting
+     * Creates a temporary adapter to treat OtherPlayer as Player
+     */
+    private Player convertToPlayer(OtherPlayer other) {
+        // Create a lightweight adapter that provides Player interface
+        return new Player(other.x, other.y, null, 0, mapLoader, other.getName()) {
+            @Override
+            public double getX() { return other.x; }
+            @Override
+            public double getY() { return other.y; }
+            @Override
+            public String getName() { return other.getName(); }
+        };
     }
     
     /**
