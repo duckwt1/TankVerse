@@ -99,6 +99,12 @@ public class P2PClient extends Thread {
                         );
                     } catch (Exception ignored) {}
                 }
+                
+                // Send bot states (every 3 frames to reduce bandwidth)
+                if (now % 48 < 16) {
+                    sendBotStates();
+                }
+                
                 if (p.action == Constant.ACTION_CHARGE)
                 {
                     p.action = Constant.ACTION_NONE;
@@ -109,6 +115,37 @@ public class P2PClient extends Thread {
         }
     }
 
+    /**
+     * Send all bot states to peers
+     */
+    private void sendBotStates() {
+        var botManager = playPanel.getBotManager();
+        if (botManager == null) return;
+        
+        for (var bot : botManager.getBots()) {
+            String msg = "BOT " +
+                    bot.getName() + " " +
+                    bot.getX() + " " +
+                    bot.getY() + " " +
+                    bot.getBodyAngle() + " " +
+                    bot.getGunAngle() + " " +
+                    bot.getHp() + " " +
+                    (bot.isAlive() ? 1 : 0);
+            
+            for (Map<String, Object> peer : peers) {
+                if (peer.get("name").equals(playPanel.getPlayer().getName())) continue;
+                
+                try {
+                    send(
+                            msg,
+                            InetAddress.getByName(peer.get("ip").toString()),
+                            ((Number) peer.get("udpPort")).intValue()
+                    );
+                } catch (Exception ignored) {}
+            }
+        }
+    }
+    
     // ================= RECEIVE =================
     private void recvLoop() {
         byte[] buf = new byte[2048];
@@ -135,6 +172,9 @@ public class P2PClient extends Thread {
                 }
                 else if (msg.startsWith("STATE ")) {
                     parseState(msg.substring(6));
+                }
+                else if (msg.startsWith("BOT ")) {
+                    parseBotState(msg.substring(4));
                 }
 
             } catch (SocketTimeoutException ignored) {
@@ -172,7 +212,30 @@ public class P2PClient extends Thread {
 
         send("HELLO_ACK " + playPanel.getPlayer().getName(), ip, port);
     }
-
+    // ================= BOT STATE HANDLER =================
+    /**
+     * Parse bot state: "BOT name x y bodyAngle gunAngle hp isAlive"
+     */
+    private void parseBotState(String data) {
+        String[] parts = data.split(" ");
+        if (parts.length < 7) return;
+        
+        try {
+            String botName = parts[0];
+            double x = Double.parseDouble(parts[1]);
+            double y = Double.parseDouble(parts[2]);
+            double bodyAngle = Double.parseDouble(parts[3]);
+            double gunAngle = Double.parseDouble(parts[4]);
+            int hp = Integer.parseInt(parts[5]);
+            boolean isAlive = Integer.parseInt(parts[6]) == 1;
+            
+            // Update or create remote bot
+            playPanel.updateRemoteBot(botName, x, y, bodyAngle, gunAngle, hp, isAlive);
+            
+        } catch (Exception e) {
+            System.err.println("[P2P] Error parsing bot state: " + e.getMessage());
+        }
+    }
     // ================= STATE PARSER =================
     private void parseState(String data) {
         try {

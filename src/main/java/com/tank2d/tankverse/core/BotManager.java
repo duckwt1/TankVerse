@@ -96,6 +96,15 @@ public class BotManager {
     }
     
     /**
+     * Add existing bot (for remote sync)
+     */
+    public void addBot(BotPlayer bot) {
+        if (!bots.contains(bot)) {
+            bots.add(bot);
+        }
+    }
+    
+    /**
      * Update tất cả bots
      */
     public void updateAll(PlayPanel panel) {

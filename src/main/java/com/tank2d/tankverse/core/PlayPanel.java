@@ -379,6 +379,23 @@ public class PlayPanel extends Pane implements Runnable {
     public BotManager getBotManager() {
         return botManager;
     }
+    
+    /**
+     * Update remote bot state (for P2P sync)
+     */
+    public void updateRemoteBot(String botName, double x, double y, double bodyAngle, double gunAngle, int hp, boolean isAlive) {
+        var bot = botManager.getBot(botName);
+        
+        if (bot == null) {
+            // Bot doesn't exist, create it
+            bot = new com.tank2d.tankverse.entity.BotPlayer(x, y, mapLoader, botName);
+            botManager.addBot(bot);
+            System.out.println("[PlayPanel] Created remote bot: " + botName);
+        }
+        
+        // Update state
+        bot.setRemoteState(x, y, bodyAngle, gunAngle, hp, isAlive);
+    }
 
     private void addQuitButton() {
         Button btnQuit = new Button("QUIT GAME");

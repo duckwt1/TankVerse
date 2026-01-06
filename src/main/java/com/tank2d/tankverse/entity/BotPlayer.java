@@ -618,7 +618,30 @@ public class BotPlayer extends Entity {
         return dmg;
     }
     
+    public double getBodyAngle() {
+        return bodyAngle;
+    }
+    
+    public double getGunAngle() {
+        return gunAngle;
+    }
+    
+    public boolean isAlive() {
+        return isAlive;
+    }
+    
     public Polygon getWorldSolidArea() {
         return solidArea;
+    }
+    
+    // ===== SETTERS FOR REMOTE SYNC =====
+    public void setRemoteState(double x, double y, double bodyAngle, double gunAngle, int hp, boolean isAlive) {
+        this.x = x;
+        this.y = y;
+        this.bodyAngle = bodyAngle;
+        this.gunAngle = gunAngle;
+        this.hp = hp;
+        this.isAlive = isAlive;
+        initSolidArea(); // Update collision box
     }
 }
