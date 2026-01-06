@@ -151,7 +151,7 @@ public class Player extends Entity {
     @Override
     public void getImages() {
         try {
-            bodyImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/heavy_tank.png"));
+            bodyImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/tank2.png"));
             gunImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/gun/gun1.png"));
             dieImage = new Image(getClass().getResourceAsStream("/com/tank2d/tankverse/tank/die.png"));
 
@@ -191,6 +191,8 @@ public class Player extends Entity {
             int damage = (panel.getDamage(collide.ownerName));
 
             hp -= damage;
+            mapLoader.eManager.spawnTankExplosion(x, y, this.bodyImage, 10);
+
             if (hp <= 0 && this.isAlive) {
                 hp = 0;
                 this.isAlive = false;

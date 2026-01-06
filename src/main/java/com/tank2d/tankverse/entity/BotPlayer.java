@@ -147,12 +147,15 @@ public class BotPlayer extends Entity {
         if (collide != null) {
             int damage = panel.getDamage(collide.ownerName);
             hp -= damage;
-            
+            mapLoader.eManager.spawnTankExplosion(x, y, this.bodyImage, 10);
+
             if (hp <= 0 && isAlive) {
                 hp = 0;
                 isAlive = false;
                 die++;
+                mapLoader.eManager.spawnTankExplosion(x, y, this.bodyImage, 100);
                 startRespawnCountdown();
+
                 return;
             }
         }

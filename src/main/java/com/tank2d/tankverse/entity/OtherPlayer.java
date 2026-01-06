@@ -125,6 +125,7 @@ public class OtherPlayer extends Entity{
         Bullet collide = mapLoader.checkPlayerBulletCollision(this);
         if (collide != null) {
             int damage = panel.getDamage(collide.ownerName);
+            mapLoader.eManager.spawnTankExplosion(x, y, this.bodyImage, 10);
 
             hp -= damage;
             System.out.println("o player " + hp);
