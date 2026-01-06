@@ -1,6 +1,7 @@
 package com.tank2d.tankverse.effect;
 
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,20 @@ public class EffectManager {
         for (Effect e : effects) {
             e.draw(gc, camX, camY);
         }
+    }
+    public void spawnTankExplosion(
+            double x,
+            double y,
+            Image tankImage,
+            double radius
+    ) {
+        add(new ImageExplosionEffect(
+                x,
+                y,
+                tankImage,
+                36, // number of pieces
+                radius
+        ));
     }
 
     public void clear() {

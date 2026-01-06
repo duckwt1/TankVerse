@@ -42,7 +42,7 @@ public class Bullet extends GameObject {
         // Kiểm tra collision
         if (map.checkBulletCollision(polygon)) {
             active = false;
-            map.eManager.spawnExplosion(this.x, this.y, 200);
+            map.eManager.spawnExplosion(this.x, this.y, 20);
             //System.out.println("💥 Bullet hit a wall!");
         }
 
