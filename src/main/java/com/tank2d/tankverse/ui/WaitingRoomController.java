@@ -75,8 +75,10 @@ public class WaitingRoomController implements PacketListener {
             List<Map<String, Object>> playersData = (List<Map<String, Object>>) p.data.get("players");
             int mapId = getInt(p.data.getOrDefault("mapId", 1), 1);
             
-            // Get bot count from server
-            int serverBotCount = getInt(p.data.getOrDefault("botCount", 0), 0);
+            // Get bot count from server, fallback to local botCount if not provided
+            int serverBotCount = getInt(p.data.getOrDefault("botCount", botCount), botCount);
+            System.out.println("[Client] Bot count from packet: " + p.data.getOrDefault("botCount", "NOT FOUND"));
+            System.out.println("[Client] Using bot count: " + serverBotCount + " (local: " + botCount + ")");
 
             // === NHẬN DANH SÁCH PEERS TỪ SERVER ===
             List<Map<String, Object>> peers = (List<Map<String, Object>>) p.data.get("peers");
@@ -89,9 +91,13 @@ public class WaitingRoomController implements PacketListener {
             PlayPanel playPanel = new PlayPanel(client.getUserName(), playersData.size(), playersData, mapId, client);
             
             // Spawn bots
+            System.out.println("[Client] Bot count from server: " + serverBotCount);
             if (serverBotCount > 0) {
                 System.out.println("[Client] Spawning " + serverBotCount + " bots...");
                 playPanel.spawnBots(serverBotCount);
+                System.out.println("[Client] Bots spawned successfully!");
+            } else {
+                System.out.println("[Client] ⚠️ No bots will be spawned (botCount = 0). Host needs to select bot count in waiting room.");
             }
 
             Stage stage = (Stage) lblStatus.getScene().getWindow();
@@ -151,6 +157,30 @@ public class WaitingRoomController implements PacketListener {
         // Enable bot selection for host only
         if (cmbBotCount != null) {
             cmbBotCount.setDisable(!host);
+            if (host) {
+                System.out.println("[WaitingRoom] Host can now select bot count. Current value: " + cmbBotCount.getValue());
+                
+                // Send default bot count to server with slight delay to ensure room is set up
+                if (client != null) {
+                    String currentBotCount = cmbBotCount.getValue();
+                    if (currentBotCount != null) {
+                        int botCountValue = Integer.parseInt(currentBotCount);
+                        
+                        // Delay 100ms to ensure server has processed room creation
+                        new Thread(() -> {
+                            try {
+                                Thread.sleep(100);
+                                Packet packet = new Packet(PacketType.BOT_COUNT_CHANGED);
+                                packet.data.put("botCount", botCountValue);
+                                client.sendPacket(packet);
+                                System.out.println("[WaitingRoom] 🤖 Sent initial bot count (" + botCountValue + ") to server");
+                            } catch (InterruptedException e) {
+                                e.printStackTrace();
+                            }
+                        }).start();
+                    }
+                }
+            }
         }
 //        if (host) {
 //            reportUdpPortOnce(); // 🔥 HOST CŨNG PHẢI BÁO
@@ -177,11 +207,13 @@ public class WaitingRoomController implements PacketListener {
         // Initialize bot count combo box
         if (cmbBotCount != null) {
             cmbBotCount.getItems().addAll("0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10");
-            cmbBotCount.setValue("0");
+            cmbBotCount.setValue("2"); // Default 2 bots
             cmbBotCount.setDisable(true); // Disabled by default, enabled for host
             
             // Listen for changes
             cmbBotCount.setOnAction(e -> onBotCountChanged());
+            
+            System.out.println("[WaitingRoom] Bot count combo box initialized with default: 2");
         }
 
         // Initialize map display
@@ -267,18 +299,24 @@ public class WaitingRoomController implements PacketListener {
     }
     
     private void onBotCountChanged() {
-        if (!isHost) return;
+        if (!isHost) {
+            System.out.println("[WaitingRoom] Non-host tried to change bot count - ignored");
+            return;
+        }
         
         String selected = cmbBotCount.getValue();
         if (selected != null) {
             botCount = Integer.parseInt(selected);
-            System.out.println("[WaitingRoom] Host selected " + botCount + " bots");
+            System.out.println("[WaitingRoom] 🤖 Host selected " + botCount + " bots");
             
             // Send to server to broadcast to all clients
             if (client != null && !isUpdatingFromServer) {
                 Packet packet = new Packet(PacketType.BOT_COUNT_CHANGED);
                 packet.data.put("botCount", botCount);
                 client.sendPacket(packet);
+                System.out.println("[WaitingRoom] Sent bot count to server");
+            } else {
+                System.out.println("[WaitingRoom] ⚠️ Cannot send bot count (client null or updating from server)");
             }
         }
     }

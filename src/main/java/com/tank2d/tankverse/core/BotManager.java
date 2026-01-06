@@ -41,12 +41,46 @@ public class BotManager {
     }
     
     /**
+     * Spawn bot gần player (300-600 pixels)
+     */
+    public void spawnBotNearPlayer(Player player) {
+        // Random angle
+        double angle = random.nextDouble() * Math.PI * 2;
+        // Random distance từ 300 đến 600 pixels
+        double distance = 300 + random.nextDouble() * 300;
+        
+        double spawnX = player.x + Math.cos(angle) * distance;
+        double spawnY = player.y + Math.sin(angle) * distance;
+        
+        botCounter++;
+        String botName = "Bot_" + botCounter;
+        
+        BotPlayer bot = new BotPlayer(spawnX, spawnY, mapLoader, botName);
+        bots.add(bot);
+        
+        System.out.println("[BotManager] Spawned " + botName + " near player at (" + (int)spawnX + ", " + (int)spawnY + ") - " + (int)distance + "px away");
+    }
+    
+    /**
      * Spawn nhiều bots
      */
     public void spawnBots(int count) {
+        System.out.println("[BotManager] 🤖 Spawning " + count + " bots...");
         for (int i = 0; i < count; i++) {
             spawnBot();
         }
+        System.out.println("[BotManager] ✅ Total bots now: " + bots.size());
+    }
+    
+    /**
+     * Spawn nhiều bots gần player
+     */
+    public void spawnBotsNearPlayer(int count, Player player) {
+        System.out.println("[BotManager] 🤖 Spawning " + count + " bots near player...");
+        for (int i = 0; i < count; i++) {
+            spawnBotNearPlayer(player);
+        }
+        System.out.println("[BotManager] ✅ Total bots now: " + bots.size());
     }
     
     /**

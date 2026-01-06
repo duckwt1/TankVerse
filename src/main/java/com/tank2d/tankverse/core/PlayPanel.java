@@ -363,7 +363,9 @@ public class PlayPanel extends Pane implements Runnable {
     }
 
     public void spawnBots(int count) {
-        botManager.spawnBots(count);
+        System.out.println("[PlayPanel] 🤖 Received request to spawn " + count + " bots near player");
+        botManager.spawnBotsNearPlayer(count, player);
+        System.out.println("[PlayPanel] ✅ Bot spawn complete. Total bots: " + botManager.getBotCount());
     }
 
     public void spawnBotAt(double x, double y, String name) {

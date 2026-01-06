@@ -519,11 +519,19 @@ public class BotPlayer extends Entity {
      * Draw bot (relative to camera/player)
      */
     public void draw(GraphicsContext gc, Player camera) {
-        if (bodyImage == null || gunImage == null) return;
+        if (bodyImage == null || gunImage == null) {
+            System.out.println("[Bot] WARNING: " + botName + " has null images! Body=" + bodyImage + " Gun=" + gunImage);
+            return;
+        }
         
         // Calculate screen position relative to camera
         double screenX = x - camera.getX() + Constant.SCREEN_WIDTH / 2.0;
         double screenY = y - camera.getY() + Constant.SCREEN_HEIGHT / 2.0;
+        
+        // Debug: Print position every 60 frames
+        if (System.currentTimeMillis() % 1000 < 16) {
+            System.out.println("[Bot] " + botName + " at world(" + (int)x + "," + (int)y + ") screen(" + (int)screenX + "," + (int)screenY + ") alive=" + isAlive);
+        }
         
         // Don't draw if off-screen
         if (screenX < -100 || screenX > Constant.SCREEN_WIDTH + 100 ||
