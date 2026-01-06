@@ -80,6 +80,7 @@ public class Player extends Entity {
         dmg = 5;
         this.spawnX = x;
         this.spawnY = y;
+        spawnRandomInCenter(mapLoader);
 
     }
     public boolean willCollide(double testX, double testY, double bodyAngle) {
@@ -368,6 +369,7 @@ public class Player extends Entity {
         // reset position to spawn
         this.x = spawnX;
         this.y = spawnY;
+        spawnRandomInCenter(mapLoader);
 
         // reset angles (tuỳ bạn)
         // this.bodyAngle = 0;
@@ -511,6 +513,55 @@ public class Player extends Entity {
         t.setFont(gc.getFont());
         double w = t.getLayoutBounds().getWidth();
         gc.fillText(text, (Constant.SCREEN_WIDTH - w) / 2.0, y);
+    }
+    public void spawnRandomInCenter(MapLoader mapLoader) {
+
+        // ===== CONFIG =====
+        int maxTry = 200; // số lần thử tối đa
+        double centerRatio = 0.4; // 40% vùng trung tâm
+
+        double mapW = mapLoader.width * Constant.TILESIZE;
+        double mapH = mapLoader.height * Constant.TILESIZE;
+
+        // vùng center
+        double minX = mapW * (0.5 - centerRatio / 2);
+        double maxX = mapW * (0.5 + centerRatio / 2);
+        double minY = mapH * (0.5 - centerRatio / 2);
+        double maxY = mapH * (0.5 + centerRatio / 2);
+
+        for (int i = 0; i < maxTry; i++) {
+
+            double rx = minX + Math.random() * (maxX - minX);
+            double ry = minY + Math.random() * (maxY - minY);
+
+            // thử với bodyAngle hiện tại
+            Polygon testPoly = buildSolidArea(rx, ry, bodyAngle);
+
+            Polygon old = this.solidArea;
+            this.solidArea = testPoly;
+
+            boolean collide = mapLoader.checkCollision(rx, ry, this);
+
+            this.solidArea = old;
+
+            if (!collide) {
+                // ===== SPAWN THÀNH CÔNG =====
+                this.x = rx;
+                this.y = ry;
+                this.spawnX = rx;
+                this.spawnY = ry;
+
+                initSolidArea();
+                System.out.println("✅ Player spawned at (" + rx + ", " + ry + ")");
+                return;
+            }
+        }
+
+        // ===== FALLBACK =====
+        System.err.println("⚠️ Cannot find valid spawn position, using default spawn.");
+        this.x = spawnX;
+        this.y = spawnY;
+        initSolidArea();
     }
 
 

@@ -3,56 +3,65 @@
  <image source="../TX Tileset Wall.png" width="512" height="512"/>
  <tile id="25">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-1.33333" y="-3" width="10.6667" height="37.3333"/>
+   <object id="4" x="-0.25" y="-0.625">
+    <polygon points="0,0 9.875,0.25 9.625,32.25 0.25,31.875"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="26">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="23" y="-1">
-    <polyline points="0,0 0.333333,31.6667 1.33333,36 7.33333,34.6667 9.33333,-4.33333"/>
+   <object id="4" x="24.625" y="-5.375">
+    <polygon points="0,0 -0.125,40.875 6.375,40.25 7,-0.625"/>
    </object>
-   <object id="2" x="22.6667" y="-2.33333" width="9.66667" height="37.3333"/>
   </objectgroup>
  </tile>
  <tile id="28">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-2" y="-1.33333" width="34.3333" height="10.3333"/>
+   <object id="2" x="-0.625" y="-2.75">
+    <polygon points="0,0 0,10.625 43.875,11.5 37.625,-1.625"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="29">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-1.33333" y="-0.666667" width="35.3333" height="9.33333"/>
+   <object id="2" x="0.25" y="-3.125">
+    <polygon points="0,0 -0.75,11 32.5,10.375 31.75,-0.375"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="30">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-2" y="-2" width="35.3333" height="10.6667"/>
+   <object id="2" x="-1.375" y="-3.75">
+    <polygon points="0,0 0.625,11.375 38.125,12 34.75,1"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="41">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-1.66667" y="-2.33333" width="9.66667" height="36.3333"/>
+   <object id="3" x="0.875" y="0.25">
+    <polygon points="0,0 -0.125,31 6.625,31.5 6.5,0"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="42">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="21" y="-8">
-    <polyline points="0,0 1.66667,46 10.3333,46.3333 11.3333,-3.33333"/>
+   <object id="4" x="26" y="-5.5">
+    <polygon points="0,0 -2.375,42.125 6.5,40.375 5.5,0.625 -3.25,-1.125 -1,27.75"/>
    </object>
-   <object id="2" x="22.3333" y="-3.66667" width="10.3333" height="38"/>
   </objectgroup>
  </tile>
  <tile id="57">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="-2.66667" y="-5" width="11" height="40.6667"/>
+   <object id="3" x="0.25" y="0.625">
+    <polygon points="0,0 0.5,31.375 7.25,31.75 7.375,-4.375 0,-3.75"/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="58">
   <objectgroup draworder="index" id="2">
-   <object id="1" x="20" y="-11">
-    <polyline points="0,0 3,49.6667 14.6667,48 10.3333,-1.33333"/>
+   <object id="5" x="24.875" y="39.375">
+    <polygon points="0,0 -1.375,-45 6.875,-44.875 6.875,0.375"/>
    </object>
-   <object id="2" x="24.3333" y="-2.66667" width="8.33333" height="39"/>
   </objectgroup>
  </tile>
 </tileset>
