@@ -131,6 +131,8 @@ public class OtherPlayer extends Entity{
             if (hp < 0){
                 hp = 0;
                 this.isAlive = false;
+                mapLoader.eManager.spawnTankExplosion(this.x, this.y, this.bodyImage, 100);
+
                 dieCount ++;
                 if (collide.ownerName.equals(player.getName()))
                 {

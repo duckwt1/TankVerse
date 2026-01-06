@@ -305,7 +305,7 @@ public class PlayPanel extends Pane implements Runnable {
     private void draw() {
         gc.clearRect(0, 0, canvas.getWidth(), canvas.getHeight());
         mapLoader.draw(gc, this.player);
-        mapLoader.drawCollision(gc, this.player);
+        //mapLoader.drawCollision(gc, this.player);
         player.draw(gc);
         mapLoader.eManager.draw(gc, player.x, player.y);
         //player.drawSolidArea(gc);
