@@ -51,4 +51,5 @@ Responsibilities:
 Pham Ngoc Duc  
 Student at VKU – Vietnam Korea University of ICT  
 
-GitHub: https://github.com/yourusername
+GitHub: https://github.com/Ducs2005
+
